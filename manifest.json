@@ -1,0 +1,9 @@
+{
+    "Name": "WritedownYourPlan",
+    "Author": "SevenDespised",
+    "Version": "0.0.1",
+    "Description": "...",
+    "UniqueID": "SevenDespised.WritedownYourPlan",
+    "EntryDll": "WritedownYourPlan.dll",
+    "MinimumApiVersion": "4.0.0"
+}

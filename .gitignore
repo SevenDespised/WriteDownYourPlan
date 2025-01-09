@@ -1,0 +1,12 @@
+# This file is used to exclude files and directories from Git version control.
+# ignore vscode workspace files
+.vscode/
+*.code-workspace
+*.csproj
+*.sln
+*.editorconfig
+# ignore project files
+obj/
+bin/
+#ignore inspectcode.xml file
+*inspectcode.xml
