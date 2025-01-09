@@ -124,5 +124,20 @@
     "OrganizedText.Three.NPCLOCACT": "Find {{npc}} at {{location}} and {{action}}.",
     "OrganizedText.Three.NPCLOCITEM": "Find {{npc}} at {{location}} and {{item}}.",
     "OrganizedText.Three.LOCACTITEM": "Go to {{location}} and {{action}} {{item}}.",
-    "OrganizedText.Four.NPCLOCACTITEM": "Find {{npc}} at {{location}} and {{action}} {{item}}."
+    "OrganizedText.Four.NPCLOCACTITEM": "Find {{npc}} at {{location}} and {{action}} {{item}}.",
+    "ReminderMessage.Start": "The plan has started at {{time}}!",
+    "ReminderMessage.End": "The plan has ended at {{time}}!",
+    "ReminderMessage.RepeatStart": "The plan has started at {{time}} again!",
+    "ReminderMessage.Festival": "{{festival}} starts today!",
+    "ReminderMessage.NpcLoc": "{{npc}} might be at {{location}} now.",
+    "ReminderMessage.Birthday": "Today is {{npc}}'s birthday!",
+    "ReminderMessage.Rain": "It's raining today, check your plan.",
+    "ReminderMessage.NoRain": "It's not raining today, check your plan.",
+    "ReminderMessage.Lucky": "It's a lucky day today, check your plan.",
+    "ReminderMessage.Unlucky": "It's an unlucky day today, check your plan.",
+    "ReminderMessage.ActUnmatch": "{{npc}} seems unable to perform {{action}}",
+    "ReminderMessage.LocUnmatch": "{{npc}} seems to never appear at {{location}}",
+    "ReminderMessage.ContainBirthday": "{{date}} is {{npc}}'s birthday!",
+    "ReminderMessage.ContainFestival": "{{date}} is {{festival}}!",
+    "ReminderMessage.ContainPassiveFestival": "{{date}} is {{festival}}!"    
 }

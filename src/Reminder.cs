@@ -9,21 +9,22 @@ public class Reminder
     PlanData model;
     ModData modData;
     private List<List<RemindMessage>>? remindMessages = null;
-    const string reminderStartKey = "start";
-    const string reminderEndKey = "end";
-    const string reminderRepeatStartKey = "repeat_start";
-    const string reminderFestivalKey = "festival";
-    const string reminderNpcLocKey = "npc_loc";
-    const string reminderBirthdayKey = "birthday";
-    const string reminderRainKey = "rain";
-    const string reminderNorainKey = "norain";
-    const string reminderLuckyKey = "lucky";
-    const string reminderUnluckyKey = "unlucky";
-    const string reminderActUnmatchKey = "act_unmatch";
-    const string reminderLocUnmatchKey = "loc_unmatch";
-    const string reminderContainBirthdayKey = "contain_birthday";
-    const string reminderContainFestivalKey = "contain_festival";
-    const string reminderContainPassiveFestivalKey = "contain_passive_festival";
+const string reminderStartKey = "Start";
+const string reminderEndKey = "End";
+const string reminderRepeatStartKey = "RepeatStart";
+const string reminderFestivalKey = "Festival";
+const string reminderNpcLocKey = "NpcLoc";
+const string reminderBirthdayKey = "Birthday";
+const string reminderRainKey = "Rain";
+const string reminderNorainKey = "NoRain";
+const string reminderLuckyKey = "Lucky";
+const string reminderUnluckyKey = "Unlucky";
+const string reminderActUnmatchKey = "ActUnmatch";
+const string reminderLocUnmatchKey = "LocUnmatch";
+const string reminderContainBirthdayKey = "ContainBirthday";
+const string reminderContainFestivalKey = "ContainFestival";
+const string reminderContainPassiveFestivalKey = "ContainPassiveFestival";
+
     public Reminder(PlanData model, ModData modData)
     {
         this.model = model;

@@ -124,5 +124,20 @@
     "OrganizedText.Three.NPCLOCACT": "前往{{location}}找到{{npc}}并{{action}}。",
     "OrganizedText.Three.NPCLOCITEM": "前往{{location}}找到{{npc}}，带着{{item}}。",
     "OrganizedText.Three.LOCACTITEM": "前往{{location}}并{{action}} {{item}}。",
-    "OrganizedText.Four.NPCLOCACTITEM": "前往{{location}}找到{{npc}}并{{action}} {{item}}。"
+    "OrganizedText.Four.NPCLOCACTITEM": "前往{{location}}找到{{npc}}并{{action}} {{item}}。",
+    "ReminderMessage.Start": "计划已于{{time}}开始！",
+    "ReminderMessage.End": "计划已于{{time}}结束！",
+    "ReminderMessage.RepeatStart": "计划已于{{time}}开始！",
+    "ReminderMessage.Festival": "{{festival}}将于今日开始！",
+    "ReminderMessage.NpcLoc": "现在{{npc}}或许在{{location}}}",
+    "ReminderMessage.Birthday": "今天是{{npc}}的生日！",
+    "ReminderMessage.Rain": "今天下雨，确认一下计划吧。",
+    "ReminderMessage.NoRain": "今天不下雨，确认一下计划吧。",
+    "ReminderMessage.Lucky": "今天运气很好，确认一下计划吧。",
+    "ReminderMessage.Unlucky": "今天运气不好，确认一下计划吧。",
+    "ReminderMessage.ActUnmatch": "{{npc}}似乎不能进行{{action}}",
+    "ReminderMessage.LocUnmatch": "{{npc}}似乎永远也不会出现在{{location}}",
+    "ReminderMessage.ContainBirthday": "{{date}}是{{npc}}的生日！",
+    "ReminderMessage.ContainFestival": "{{date}}是{{festival}}！",
+    "ReminderMessage.ContainPassiveFestival": "{{date}}是{{festival}}！"
 }
