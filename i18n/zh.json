@@ -125,6 +125,7 @@
     "OrganizedText.Three.NPCLOCITEM": "前往{{location}}找到{{npc}}，带着{{item}}。",
     "OrganizedText.Three.LOCACTITEM": "前往{{location}}并{{action}} {{item}}。",
     "OrganizedText.Four.NPCLOCACTITEM": "前往{{location}}找到{{npc}}并{{action}} {{item}}。",
+    "ReminderMessage.PlanNum": "计划{{num}}消息：",
     "ReminderMessage.Start": "计划已于{{time}}开始！",
     "ReminderMessage.End": "计划已于{{time}}结束！",
     "ReminderMessage.RepeatStart": "计划已于{{time}}开始！",
