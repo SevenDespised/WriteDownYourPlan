@@ -2,6 +2,7 @@ using StardewValley;
 using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 using System.Text.RegularExpressions;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace WritedownYourPlan.src;
 public class Reminder
@@ -9,21 +10,21 @@ public class Reminder
     PlanData model;
     ModData modData;
     private List<List<RemindMessage>>? remindMessages = null;
-const string reminderStartKey = "Start";
-const string reminderEndKey = "End";
-const string reminderRepeatStartKey = "RepeatStart";
-const string reminderFestivalKey = "Festival";
-const string reminderNpcLocKey = "NpcLoc";
-const string reminderBirthdayKey = "Birthday";
-const string reminderRainKey = "Rain";
-const string reminderNorainKey = "NoRain";
-const string reminderLuckyKey = "Lucky";
-const string reminderUnluckyKey = "Unlucky";
-const string reminderActUnmatchKey = "ActUnmatch";
-const string reminderLocUnmatchKey = "LocUnmatch";
-const string reminderContainBirthdayKey = "ContainBirthday";
-const string reminderContainFestivalKey = "ContainFestival";
-const string reminderContainPassiveFestivalKey = "ContainPassiveFestival";
+    const string reminderStartKey = "Start";
+    const string reminderEndKey = "End";
+    const string reminderRepeatStartKey = "RepeatStart";
+    const string reminderFestivalKey = "Festival";
+    const string reminderNpcLocKey = "NpcLoc";
+    const string reminderBirthdayKey = "Birthday";
+    const string reminderRainKey = "Rain";
+    const string reminderNorainKey = "NoRain";
+    const string reminderLuckyKey = "Lucky";
+    const string reminderUnluckyKey = "Unlucky";
+    const string reminderActUnmatchKey = "ActUnmatch";
+    const string reminderLocUnmatchKey = "LocUnmatch";
+    const string reminderContainBirthdayKey = "ContainBirthday";
+    const string reminderContainFestivalKey = "ContainFestival";
+    const string reminderContainPassiveFestivalKey = "ContainPassiveFestival";
 
     public Reminder(PlanData model, ModData modData)
     {
@@ -31,16 +32,17 @@ const string reminderContainPassiveFestivalKey = "ContainPassiveFestival";
         this.modData = modData;
     }
     
-    public void Draw()
+    public void Draw(SpriteBatch b, int x, int y, int width, int height, int planIndex)
     {
-        if (remindMessages == null)
+        if (remindMessages == null || remindMessages[planIndex].Count == 0)
         {
             return;
         }
+        
     }
     public void InitReminder()
     {
-        remindMessages = getAllRemindMessages();
+        remindMessages = GetAllRemindMessages();
     }
     public void DeleteReminder()
     {
@@ -55,7 +57,7 @@ const string reminderContainPassiveFestivalKey = "ContainPassiveFestival";
         }
         return false;
     }
-    private List<List<RemindMessage>> getAllRemindMessages()
+    private List<List<RemindMessage>> GetAllRemindMessages()
     {
         List<List<RemindMessage>> res = new();
         for (int i = 0; i < model.plan.Count; i++)
@@ -121,19 +123,27 @@ const string reminderContainPassiveFestivalKey = "ContainPassiveFestival";
         //rainy tomorrow, rainy today, lucky today
         //festival tomorrow, festival today, birthday tomorrow, birthday today,
         List<RemindMessage> res = new();
-        List<SDate> dates;
-        dates = TimeUtils.DateParse(plan.time, out int[] time);
-        SDate start = dates[0];
-        SDate end = dates[1];
+        List<SDate> dates = TimeUtils.DateParse(plan.time, out int[] time);;
+        string timeString = "";
         SDate now = SDate.Now();
         // compare current time with start time
-        if (now == start)
+        if (dates.Count > 0 && now == dates[0])
         {
-            res.Add(new RemindMessage(reminderStartKey, null, time[0]));
+            if (time[0] != 0)
+            {
+                timeString = TimeList.Hours[(time[0] - 600) / 100];
+            }
+            res.Add(new RemindMessage(reminderStartKey, timeString == ""? null : new List<string> { timeString }, time[0] == 600 ? 610 : time[0]));
+            timeString = "";
         }
-        if (now == end)
+        if (dates.Count > 0 && now == dates[1])
         {
-            res.Add(new RemindMessage(reminderEndKey, null, time[1]));
+            if (time[1] != 0)
+            {
+                timeString = TimeList.Hours[(time[1] - 600) / 100];
+            }
+            res.Add(new RemindMessage(reminderEndKey, timeString == ""? null : new List<string> { timeString }, time[1] == 600 ? 610 : time[1]));
+            timeString = "";
         }
         //repeat
         if (plan.repeat != "")
@@ -151,7 +161,11 @@ const string reminderContainPassiveFestivalKey = "ContainPassiveFestival";
             }
             if (isRepeatToday)
             {
-                res.Add(new RemindMessage(reminderRepeatStartKey, null, time[0]));
+                if (time[0] != 0)
+                {
+                    timeString = TimeList.Hours[(time[0] - 600) / 100];
+                }
+                res.Add(new RemindMessage(reminderRepeatStartKey, timeString == "" ? null : new List<string> { timeString }, time[0] == 600 ? 610 : time[0]));
             }
         }
         //festival
@@ -188,11 +202,11 @@ const string reminderContainPassiveFestivalKey = "ContainPassiveFestival";
         {
             if (!modData.npc_data[plan.npc][1].Contains(plan.action))
             {
-                res.Add(new RemindMessage(reminderActUnmatchKey, new List<string> { plan.npc, plan.action }, 0));
+                res.Add(new RemindMessage(reminderActUnmatchKey, new List<string> { NPC.GetDisplayName(plan.npc), Translations.GetStr("ChooseAction", plan.action) }, 0));
             }
             if (!modData.npc_data[plan.npc][0].Contains(plan.location))
             {
-                res.Add(new RemindMessage(reminderLocUnmatchKey, new List<string> { plan.npc, plan.location }, 0));
+                res.Add(new RemindMessage(reminderLocUnmatchKey, new List<string> { NPC.GetDisplayName(plan.npc), Translations.GetStr("ChooseLocation", plan.location) }, 0));
             }
         }
         return res;
@@ -252,5 +266,12 @@ public sealed class RemindMessage
         AdditionalInfo = additionalInfo ?? new List<string>();
         RemindTime = remindTime;
     }
-
+    public static string GetRemindMessageDisplay(RemindMessage message)
+    {
+        return Translations.GetStr("ReminderMessage", message.DisplayKey, message.AdditionalInfo);
+    }
+    public string GetRemindMessageDisplay()
+    {
+        return Translations.GetStr("ReminderMessage", DisplayKey, AdditionalInfo);
+    }
 }

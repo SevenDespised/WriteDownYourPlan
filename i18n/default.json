@@ -129,7 +129,7 @@
     "ReminderMessage.Start": "The plan has started at {{time}}!",
     "ReminderMessage.End": "The plan has ended at {{time}}!",
     "ReminderMessage.RepeatStart": "The plan has started at {{time}}",
-    "ReminderMessage.Festival": "{{festival}} starts today!",
+    "ReminderMessage.Festival": "Some festival starts today!",
     "ReminderMessage.NpcLoc": "{{npc}} may be at {{location}} now.",
     "ReminderMessage.Birthday": "Today is {{npc}}'s birthday!",
     "ReminderMessage.Rain": "It's raining today, check your plan.",

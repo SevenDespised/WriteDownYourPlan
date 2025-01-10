@@ -171,24 +171,8 @@ public static class TimeUtils
         int[] index = new int[4];
         int day = (date.Day - 1) % 7;
         int week = (date.Day - 1) / 7;
-        string season = date.Season.ToString();
         index[0] = date.Year - 1;
-        if (season == "Spring")
-        {
-            index[1] = 0;
-        }
-        else if (season == "Summer")
-        {
-            index[1] = 1;
-        }
-        else if (season == "Fall")
-        {
-            index[1] = 2;
-        }
-        else if (season == "Winter")
-        {
-            index[1] = 3;
-        }
+        index[1] = date.SeasonIndex;
         index[2] = week;
         index[3] = day;
         return index;

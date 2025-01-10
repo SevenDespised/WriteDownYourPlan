@@ -785,3 +785,29 @@ public class DrawPortraitBackground
         b.Draw(texture, new Rectangle(x + width - (int)((float)num1 * scale), y + (int)((float)num1 * scale), (int)((float)num1 * scale), height - (int)((float)num1 * scale) * 2), new Rectangle(sourceRect.X + num1 + num2, num1 + sourceRect.Y, num1, num2), color, 0f, Vector2.Zero, SpriteEffects.None, draw_layer);
     }
 }
+public class DrawReminder
+{
+    public static void Draw(SpriteBatch b, int x, int y, int width, int height, List<RemindMessage> remindMessage)
+    {
+        DrawPortraitBackground.Draw(b, Game1.mouseCursors, new Rectangle(603, 414, 74, 74), x, y, width, height, Color.White);
+        int num1 = 0;
+        for (int i = 0; i < remindMessage.Count; i++)
+        {
+            num1 += DrawMultilineString(b, remindMessage[i].GetRemindMessageDisplay(), Game1.smallFont, x + 16, y + 16 + num1, Color.Black, width - 32);
+        }
+    }
+    public static int DrawMultilineString(SpriteBatch b, string text, SpriteFont font, int x, int y, Color color, int line_width = 200)
+    {
+        Vector2 size = font.MeasureString(text);
+        int line_height = (int)size.Y + 4;
+        int line_count = (int)Math.Ceiling(size.X / (float)line_width);
+        for (int i = 0; i < line_count; i++)
+        {
+            int start_index = i * line_width;
+            int end_index = Math.Min(text.Length, start_index + line_width);
+            string line = text.Substring(start_index, end_index - start_index);
+            b.DrawString(font, line, new Vector2(x, y + i * line_height), color);
+        }
+        return line_height * line_count;
+    }
+}
