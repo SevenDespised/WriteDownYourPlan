@@ -125,7 +125,7 @@
     "OrganizedText.Three.NPCLOCITEM": "Find {{npc}} at {{location}} and {{item}}.",
     "OrganizedText.Three.LOCACTITEM": "Go to {{location}} and {{action}} {{item}}.",
     "OrganizedText.Four.NPCLOCACTITEM": "Find {{npc}} at {{location}} and {{action}} {{item}}.",
-    "ReminderMessage.PlanCount": "Message of Plan {{num}}:",
+    "ReminderMessage.PlanNum": "Message of Plan {{num}}:",
     "ReminderMessage.Start": "The plan has started at {{time}}!",
     "ReminderMessage.End": "The plan has ended at {{time}}!",
     "ReminderMessage.RepeatStart": "The plan has started at {{time}}",
@@ -140,5 +140,5 @@
     "ReminderMessage.LocUnmatch": "{{npc}} will never appear at {{location}}",
     "ReminderMessage.ContainBirthday": "{{date}} is {{npc}}'s birthday!",
     "ReminderMessage.ContainFestival": "{{date}} is {{festival}}!",
-    "ReminderMessage.ContainPassiveFestival": "{{date}} is {{festival}}!"    
+    "ReminderMessage.ContainPassiveFestival": "{{date}} - {{enddate}} is {{festival}}!"    
 }

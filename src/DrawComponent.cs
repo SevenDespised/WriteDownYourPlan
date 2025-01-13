@@ -438,6 +438,7 @@ public class SelectButton
         }
         return "";
     }
+    // index start from -1
     public int GetSelectedOptionIndex()
     {
         int n = select_option.Count;
@@ -800,11 +801,14 @@ public class DrawReminder
     {
         Vector2 size = font.MeasureString(text);
         int line_height = (int)size.Y + 4;
-        int line_count = (int)Math.Ceiling(size.X / (float)line_width);
+        //the count of lines
+        int line_count = (int)Math.Ceiling(size.X / line_width);
+        //count of characters in each line
+        int char_count = (int)Math.Floor(text.Length * line_width / size.X);
         for (int i = 0; i < line_count; i++)
         {
-            int start_index = i * line_width;
-            int end_index = Math.Min(text.Length, start_index + line_width);
+            int start_index = i * char_count;
+            int end_index = Math.Min(text.Length, start_index + char_count);
             string line = text.Substring(start_index, end_index - start_index);
             b.DrawString(font, line, new Vector2(x, y + i * line_height), color);
         }

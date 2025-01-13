@@ -106,6 +106,8 @@ public static class TimeUtils
         List<string>? display_text = Index2DisplayText(TimeString2Index(time_string_list));
         return display_text;
     }
+    //option index starts from -1, special value from 0 to 8
+    //0: (null, null), 1: (sunny, null), 2: (rainy, null), 3: (null, lucky), 4: (sunny, lucky), 5: (rainy, lucky), 6: (null, unlucky), 7: (sunny, unlucky), 8: (rainy, unlucky) 
     public static int EncodeSpecialTimeButton(List<SelectButton> select_buttons, int state_counts)
     {
         int state = 0;
@@ -126,7 +128,17 @@ public static class TimeUtils
         }
         return index_list;
     }
-    public static List<SDate> DateParse(string dateString, out int[] time)
+    public static int[] DecodeSpecialTime(int state, int button_count = 2, int state_count = 3)
+    {
+        int[] index_list = new int[button_count];
+        for (int i = 0; i < button_count; i++)
+        {
+            int option_index = (int)Math.Floor((double)(state / (int)Math.Pow(state_count, i)) % state_count);
+            index_list[i] = option_index;
+        }
+        return index_list;
+    }
+    public static List<SDate>? DateParse(string dateString, out int[] time)
     {
         List<SDate> res = new();
         List<int>? idx;
@@ -136,7 +148,7 @@ public static class TimeUtils
         idx = TimeString2Index(new List<string> { dateString, "" });
         if (idx == null)
         {
-            return res; 
+            return null; 
         }
         time[0] = 600 + 100 * idx[3]; // time start from 600 to 2600
         res.Add(new SDate(idx[2] + 1, seasonString[idx[1]], idx[0] + 1));

@@ -54,7 +54,7 @@ public class ModEntry: Mod
                 {
                     if (Game1.timeOfDay == message.RemindTime || (Game1.timeOfDay == 610 && message.RemindTime == 600))
                     {
-                        string hudText = Translations.GetStr("ReminderMessage", "PlanCount", i + 1) + " " + message.GetRemindMessageDisplay();
+                        string hudText = Translations.GetStr("ReminderMessage", "PlanNum", new {num = i + 1}) + " " + message.GetRemindMessageDisplay();
                         Game1.addHUDMessage(new HUDMessage(hudText, HUDMessage.newQuest_type));
                     }
                 }
