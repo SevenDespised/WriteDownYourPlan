@@ -130,7 +130,7 @@
     "ReminderMessage.End": "计划已于{{time}}结束！",
     "ReminderMessage.RepeatStart": "计划已于{{time}}开始！",
     "ReminderMessage.Festival": "今天有节日！",
-    "ReminderMessage.NpcLoc": "现在{{npc}}或许在{{location}}}",
+    "ReminderMessage.NpcLoc": "现在{{npc}}或许在{{location}}",
     "ReminderMessage.Birthday": "今天是{{npc}}的生日！",
     "ReminderMessage.Rain": "今天下雨，确认一下计划吧。",
     "ReminderMessage.NoRain": "今天不下雨，确认一下计划吧。",

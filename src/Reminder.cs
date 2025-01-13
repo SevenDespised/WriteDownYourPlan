@@ -77,10 +77,15 @@ public class Reminder
         }
         return res;
     }
-    private static bool IsContainedByPlan(SDate date, Plan plan)
+    //
+    private static bool IsContainedByPlan(SDate date, List<SDate> dates)
     {
-        List<SDate>? dates = TimeUtils.DateParse(plan.time, out _);
-        if (dates != null && date >= dates[0] && date <= dates[1])
+        if (dates == null)
+        {
+            return false;
+        }
+        //SDate start = dates[1] >= SDate.Now() && SDate.Now() >= dates[0] ? SDate.Now() : dates[0];
+        if (date >= dates[0] && date <= dates[1])
         {
             return true;
         }
@@ -89,15 +94,32 @@ public class Reminder
     private List<RemindMessage> DetectPlanContained(Plan plan)
     {
         List<RemindMessage> res = new();
+        List<SDate>? dates = TimeUtils.DateParse(plan.time, out _);
+        //if plan has started but not ended, use nowToEndDates to take place dates
+        List<SDate>? nowToEndDates = null;
+        if (dates == null)
+        {
+            return res;
+        }
+        if(dates[1] < SDate.Now())
+        {
+            //res.Add(new RemindMessage(reminderEndKey, null, 610));
+            return res;
+        }
+        if(dates[0] < SDate.Now())
+        {
+            nowToEndDates = new List<SDate> { SDate.Now(), dates[1] };
+        }
         foreach (var npc in LoadData.NPCdata)
         {
             if (npc.Name == plan.npc)
             {
                 //check if npc is in the plan
                 SDate birthday = new(npc.Birthday_Day, npc.Birthday_Season);
-                if (IsContainedByPlan(birthday, plan))
+                List<SDate> datesForCheck = nowToEndDates?? dates;
+                if (IsContainedByPlan(birthday, datesForCheck) || IsContainedByPlan(birthday, datesForCheck.Select(d => new SDate(d.Day, d.Season, d.Year + 1)).ToList()))
                 {
-                    res.Add(new RemindMessage(reminderContainBirthdayKey, new { npc = npc.displayName, date =  birthday.ToString() }, 0));
+                    res.Add(new RemindMessage(reminderContainBirthdayKey, new { npc = npc.displayName, date =  birthday.ToLocaleString(withYear: false) }, 0));
                 }
                 break;
             }
@@ -110,19 +132,25 @@ public class Reminder
 
             string season = Regex.Replace(festival.Key, digitsPattern, "");
             int day = int.Parse(Regex.Replace(festival.Key, lettersPattern, ""));
-            SDate festivalDate = new(day, season);
-            if (IsContainedByPlan(festivalDate, plan))
+            SDate festivalDate = new(day, season, SDate.Now().Year > dates[0].Year ? SDate.Now().Year : dates[0].Year);
+            //fist check year, second check year + 1 
+            List<SDate> datesForCheck = nowToEndDates?? dates;
+            if (IsContainedByPlan(festivalDate, datesForCheck) || IsContainedByPlan(festivalDate, datesForCheck.Select(d => new SDate(d.Day, d.Season, d.Year + 1)).ToList()))
             {
-                res.Add(new RemindMessage(reminderContainFestivalKey, new { festival = festival.Value, date = festivalDate.ToString() }, 0));
+                res.Add(new RemindMessage(reminderContainFestivalKey, new { festival = festival.Value, date = festivalDate.ToLocaleString(withYear: false) }, 0));
+                break;            
             }
         }
         foreach (var passiveFestival in LoadData.PassiveFestivalData)
         {
             SDate startDate = new(passiveFestival.Value.StartDay, passiveFestival.Value.Season);
             SDate endDate = new(passiveFestival.Value.EndDay, passiveFestival.Value.Season);
-            if (IsContainedByPlan(startDate, plan))
+            //fist check year, second check year + 1 
+            List<SDate> datesForCheck = nowToEndDates?? dates;
+            if (IsContainedByPlan(startDate, datesForCheck) || IsContainedByPlan(startDate, datesForCheck.Select(d => new SDate(d.Day, d.Season, d.Year + 1)).ToList()))
             {
-                res.Add(new RemindMessage(reminderContainPassiveFestivalKey, new { festival = passiveFestival.Key, date = startDate.ToString(), enddate = endDate.ToString() }, 0));
+                res.Add(new RemindMessage(reminderContainPassiveFestivalKey, new { festival = passiveFestival.Key, date = startDate.ToLocaleString(withYear: false), enddate = endDate.ToLocaleString(withYear: false) }, 0));
+                break;
             }
         }
 
@@ -212,11 +240,11 @@ public class Reminder
         List<RemindMessage> res = new();
         if (plan.npc != "")
         {
-            if (!modData.npc_data[plan.npc][1].Contains(plan.action))
+            if (plan.action != "" && !modData.npc_data[plan.npc][1].Contains(plan.action))
             {
                 res.Add(new RemindMessage(reminderActUnmatchKey, new { npc = NPC.GetDisplayName(plan.npc), action = Translations.GetStr("ChooseAction", plan.action) }, 0));
             }
-            if (!modData.npc_data[plan.npc][0].Contains(plan.location))
+            if (plan.location != "" && !modData.npc_data[plan.npc][0].Contains(plan.location))
             {
                 res.Add(new RemindMessage(reminderLocUnmatchKey, new { npc =  NPC.GetDisplayName(plan.npc), location = Translations.GetStr("ChooseLocation", plan.location) }, 0));
             }
