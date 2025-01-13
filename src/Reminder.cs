@@ -10,6 +10,14 @@ public class Reminder
     PlanData model;
     ModData modData;
     private List<List<RemindMessage>>? remindMessages = null;
+    //generate attribute of remind message
+    public List<List<RemindMessage>>? RemindMessages
+    {
+        get
+        {
+            return remindMessages;
+        }
+    }
     const string reminderStartKey = "Start";
     const string reminderEndKey = "End";
     const string reminderRepeatStartKey = "RepeatStart";
@@ -48,15 +56,6 @@ public class Reminder
     {
         remindMessages = null;
     }
-    private static bool IsContainedByPlan(SDate date, Plan plan)
-    {
-        List<SDate> dates = TimeUtils.DateParse(plan.time, out _);
-        if (date >= dates[0] && date <= dates[1])
-        {
-            return true;
-        }
-        return false;
-    }
     private List<List<RemindMessage>> GetAllRemindMessages()
     {
         List<List<RemindMessage>> res = new();
@@ -73,7 +72,16 @@ public class Reminder
             res.Add(remindMessages);
         }
         return res;
-    }                    
+    }
+    private static bool IsContainedByPlan(SDate date, Plan plan)
+    {
+        List<SDate> dates = TimeUtils.DateParse(plan.time, out _);
+        if (date >= dates[0] && date <= dates[1])
+        {
+            return true;
+        }
+        return false;
+    }                   
     private List<RemindMessage> DetectPlanContained(Plan plan)
     {
         List<RemindMessage> res = new();

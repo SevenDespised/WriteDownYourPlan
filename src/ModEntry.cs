@@ -14,6 +14,7 @@ public class ModEntry: Mod
     private ModConfig? Config;
     public PlanData? model = null;
     public ModData? data;
+    public Reminder? reminder;
     //以下用于存储数据和调试
     public TestCla1 cla = new();
 
@@ -23,28 +24,56 @@ public class ModEntry: Mod
         Monitor.Log("Config is read!", LogLevel.Debug);
         Helper1 = helper;
         Monitor1 = Monitor;
-        
+
         helper.Events.Input.ButtonPressed += OnButtonPressed;
         helper.Events.Display.WindowResized += OnWindowResized;
-        helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
-        helper.Events.GameLoop.Saved += OnSaved;
-
-        helper.Events.GameLoop.Saving += OnSaving;
         helper.Events.Multiplayer.PeerConnected += OnPeerConnected;
         helper.Events.Multiplayer.ModMessageReceived += OnModMessageReceived;
+        helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
+        
+        helper.Events.GameLoop.Saving += OnSaving;
+        helper.Events.GameLoop.Saved += OnSaved;
+        helper.Events.GameLoop.TimeChanged += OnTimeChanged;
+        //todo:hudmessage
         //Constants.SaveFolderName;
         //以下用于存储数据和调试
+    }
+
+    private void OnTimeChanged(object? sender, TimeChangedEventArgs e)
+    {
+        if (reminder == null || reminder.RemindMessages == null)
+        {
+            return;
+        }
+        for (int i = 0; i < reminder.RemindMessages.Count; i++)
+        {
+            var remindeMessage = reminder.RemindMessages[i];
+            foreach (var message in remindeMessage)
+            {
+                if (message.RemindTime != 0)
+                {
+                    if (Game1.timeOfDay == message.RemindTime || (Game1.timeOfDay == 610 && message.RemindTime == 600))
+                    {
+                        string hudText = Translations.GetStr("ReminderMessage", "PlanCount", i + 1) + " " + message.GetRemindMessageDisplay();
+                        Game1.addHUDMessage(new HUDMessage(hudText, HUDMessage.newQuest_type));
+                    }
+                }
+            }
+        }
     }
 
     private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
     {
         //model = Helper.Data.ReadJsonFile<PlanData>("data/plandata.json") ?? new PlanData();
+        data = Helper.Data.ReadJsonFile<ModData>("data/data.json") ?? new ModData();
         if(Context.IsMainPlayer)
         {
             model = Helper.Data.ReadSaveData<PlanData>("plandata") ?? new PlanData();
             Monitor.Log("Model is loaded!", LogLevel.Debug);
+            reminder = new Reminder(model, data);
+            reminder.InitReminder();
+            Monitor.Log("Reminder is initialized!(host)", LogLevel.Debug);
         }
-        data = Helper.Data.ReadJsonFile<ModData>("data/data.json") ?? new ModData();
         TimeList.Init();
     }
     private void OnWindowResized(object? sender, WindowResizedEventArgs e)
@@ -71,7 +100,7 @@ public class ModEntry: Mod
             debug();
             cla.res = (Dictionary<string, HashSet<string>>)Test();
             //WriteJson("data/npc.json", cla);
-            HideWypMenu();
+            //HideWypMenu();
         }
     }
     private void OnPeerConnected(object? sender, PeerConnectedEventArgs e)
@@ -118,6 +147,12 @@ public class ModEntry: Mod
             {
                 model ??= e.ReadAs<PlanData>();
                 Monitor.Log("Received PlanData from host", LogLevel.Debug);
+                if (data != null)
+                {
+                    reminder = new Reminder(model, data);
+                    reminder.InitReminder();
+                    Monitor.Log("Reminder is initialized!(host)", LogLevel.Debug);
+                }
             }
         }
     }
