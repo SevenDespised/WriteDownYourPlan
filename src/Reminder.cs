@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace WritedownYourPlan.src;
 public class Reminder
 {
-    readonly PlanData model;
+    readonly PlanData planData;
     readonly ModData modData;
     private List<List<RemindMessage>>? remindMessages = null;
     //generate attribute of remind message
@@ -34,9 +34,9 @@ public class Reminder
     const string reminderContainFestivalKey = "ContainFestival";
     const string reminderContainPassiveFestivalKey = "ContainPassiveFestival";
 
-    public Reminder(PlanData model, ModData modData)
+    public Reminder(PlanData planData, ModData modData)
     {
-        this.model = model;
+        this.planData = planData;
         this.modData = modData;
     }
     
@@ -46,9 +46,13 @@ public class Reminder
         {
             return;
         }
-        
+        DrawReminder.Draw(b, x, y, width, height, remindMessages[planIndex]);
     }
     public void InitReminder()
+    {
+        remindMessages = GetAllRemindMessages();
+    }
+    internal void UpdateReminder()
     {
         remindMessages = GetAllRemindMessages();
     }
@@ -59,10 +63,10 @@ public class Reminder
     private List<List<RemindMessage>> GetAllRemindMessages()
     {
         List<List<RemindMessage>> res = new();
-        for (int i = 0; i < model.plan.Count; i++)
+        for (int i = 0; i < planData.plan.Count; i++)
         {
             List<RemindMessage> remindMessages = new();
-            Plan plan = model.plan[i];
+            Plan plan = planData.plan[i];
             // concat all remind messages from all detectors
             remindMessages.AddRange(DetectDate(plan));
             remindMessages.AddRange(DetectNPCloc(plan));
@@ -257,6 +261,7 @@ public class Reminder
         }
         return res;
     }
+
 }
 
 public sealed class RemindMessage

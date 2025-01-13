@@ -15,9 +15,10 @@ using static WritedownYourPlan.src.TimeUtils;
 namespace WritedownYourPlan.src;
 public class WypMenu : IClickableMenu
 {
-    public PlanData model_data;
-    public ModData data;
+    public PlanData planData;
+    public ModData modData;
     public ModConfig config;
+    private Reminder reminder;
     public readonly LoadData loaddata = new();
     public readonly int x_pos = (int)(Game1.viewport.Width * Game1.options.zoomLevel * (1 / Game1.options.uiScale)) / 2 - Game1.tileSize * 6 / 2;
     public readonly int y_pos = (int)(Game1.viewport.Height * Game1.options.zoomLevel * (1 / Game1.options.uiScale)) / 2 - Game1.tileSize * 6 / 2 - Game1.tileSize;
@@ -54,11 +55,14 @@ public class WypMenu : IClickableMenu
         Translations.GetStr("ChooseDate.Week"),
         Translations.GetStr("ChooseDate.Day")
     };
-
-    int page_index = (int)PageEnum.mainPage;
-    int plan_page_index = 0;
-    int plan_count;
-    int choose_page_index;
+    // pageIndex: 0-mainPage, 1-editPage, 2-choosePage
+    int pageIndex = (int)PageEnum.mainPage;
+    // planPageIndex: the index of plan page
+    int planPageIndex = 0;
+    // planNum: the index of the selected plan on the current page
+    int planIndexOnPage;
+    // choosePageIndex: 0-npc, 1-location, 2-action, 3-time, 4-item
+    int choosePageIndex;
     private List<string> pririoty_location = new();
     int location_display_index = 0;
     //bool is_canceling = false;
@@ -66,8 +70,8 @@ public class WypMenu : IClickableMenu
     /// <summary>
     /// Initializes a new instance of the <see cref="WypMenu"/> class with specified model and mod data.
     /// </summary>
-    /// <param name="Model">The data model containing plan information.</param>
-    /// <param name="Data">The data object containing global mod-related information.</param>
+    /// <param name="planData">The data model containing plan information.</param>
+    /// <param name="modData">The data object containing global mod-related information.</param>
     /// <remarks>
     /// This constructor sets up the layout and components of the menu, including:
     /// - Initializing the menu dimensions and bounding rectangle.
@@ -77,12 +81,12 @@ public class WypMenu : IClickableMenu
     /// - Initializing choose buttons for selecting various attributes such as NPC, location, and actions.
     /// - Setting up additional buttons for the time selection page.
     /// </remarks>
-    public WypMenu(PlanData Model, ModData Data, ModConfig Config)
+    public WypMenu(PlanData planData, ModData modData, ModConfig config)
     {
         initialize(x_pos, y_pos, ui_width, ui_height);
-        model_data = Model;
-        data = Data;
-        config = Config;
+        this.planData = planData;
+        this.modData = modData;
+        this.config = config;
         menu_bound = new Rectangle(x_pos, y_pos + action_bar_height, ui_width, ui_height - action_bar_height);
         search_box = new SearchBox(null, null, Game1.smallFont, Color.Black, Translations.GetStr("EditPage.EditTitle"));
         item_box = new SearchBox(null, null, Game1.smallFont, Color.Black, Translations.GetStr("ChooseItem.EditItem"));
@@ -103,6 +107,9 @@ public class WypMenu : IClickableMenu
             cancel_buttons.Add(new CancelButton(x_pos + ui_width - 52, y_pos + action_bar_height + bar_height * i + 30, 36, 36));
         }
         InitTimePageButtons();
+
+        reminder = new Reminder(this.planData, this.modData);
+        reminder.InitReminder();
     }
 
     /// <summary>
@@ -124,32 +131,32 @@ public class WypMenu : IClickableMenu
         // draw menu main page
         
         //draw page button
-        if (page_index == (int)PageEnum.mainPage)
+        if (pageIndex == (int)PageEnum.mainPage)
         {
             Game1.DrawBox(x_pos, y_pos, ui_width, ui_height);
             SpriteText.drawStringWithScrollCenteredAt(b, Translations.GetStr("MainPage", "Title"), xPositionOnScreen + base.width / 2, base.yPositionOnScreen - 64);
-            action_bar.Draw(b, page_index);
-            if (plan_page_index > 0)
+            action_bar.Draw(b, pageIndex);
+            if (planPageIndex > 0)
                 leftright_button.DrawLeftButton(b);
-            if (plan_page_index < model_data.plan.Count / 5 && model_data.plan.Count < config.MaxPlan)
+            if (planPageIndex < planData.plan.Count / 5 && planData.plan.Count < config.MaxPlan)
                 leftright_button.DrawRightButton(b);
             
             for (int i = 0; i < 5; i++)
             {
                 drawTextureBox(b, Game1.mouseCursors, new Rectangle(384, 396, 15, 15), x_pos, y_pos + action_bar_height + bar_height * i, ui_width, bar_height, Color.White, 4f, false);
                 cancel_buttons[i].Draw(b);
-                if (plan_page_index * 5 + i < model_data.plan.Count)
+                if (planPageIndex * 5 + i < planData.plan.Count)
                 {
-                    DrawLimitWidthString.Draw(b, model_data.plan[plan_page_index * 5 + i].title, Game1.smallFont, x_pos + 24, y_pos + action_bar_height + bar_height * i + 16, ui_width - 90, Color.Black);
-                    DrawLimitWidthString.Draw(b, TextUtils.GetOrganizedText(model_data.plan[plan_page_index * 5 + i]), Game1.smallFont, x_pos + 24, y_pos + action_bar_height + bar_height * i + 48, ui_width - 90, Color.Black);
+                    DrawLimitWidthString.Draw(b, planData.plan[planPageIndex * 5 + i].title, Game1.smallFont, x_pos + 24, y_pos + action_bar_height + bar_height * i + 16, ui_width - 90, Color.Black);
+                    DrawLimitWidthString.Draw(b, TextUtils.GetOrganizedText(planData.plan[planPageIndex * 5 + i]), Game1.smallFont, x_pos + 24, y_pos + action_bar_height + bar_height * i + 48, ui_width - 90, Color.Black);
                 }
             }
         }
-        else if (page_index == (int)PageEnum.editPage)
+        else if (pageIndex == (int)PageEnum.editPage)
         {
             Game1.DrawBox(x_pos, y_pos, ui_width, ui_height);
             SpriteText.drawStringWithScrollCenteredAt(b, Translations.GetStr("EditPage", "Title"), xPositionOnScreen + base.width / 2, base.yPositionOnScreen - 64);
-            action_bar.Draw(b, page_index);
+            action_bar.Draw(b, pageIndex);
             search_box.Bounds = new Rectangle(x_pos, y_pos + action_bar_height, ui_width, Game1.tileSize);
             if (new_plan.title != "")
             {
@@ -161,31 +168,32 @@ public class WypMenu : IClickableMenu
             choose_buttons[2].Draw(b, Translations.GetStr("EditPage.Action"), Translations.GetStr("ChooseAction", new_plan.action));
             choose_buttons[3].Draw(b, Translations.GetStr("EditPage.Time"), new_plan.time == "" ? "" : Translations.GetStr("EditPage.Time.Description"));
             choose_buttons[4].Draw(b, Translations.GetStr("EditPage.Item"), new_plan.item); 
+            reminder.Draw(b, x_pos - ui_width - 16, y_pos, ui_width, ui_height, planPageIndex * 5 + planIndexOnPage);
         }
-        else if (page_index == (int)PageEnum.choosePage)
+        else if (pageIndex == (int)PageEnum.choosePage)
         {
-            if (choose_page_index == (int)ChoosePageEnum.characterPage)
+            if (choosePageIndex == (int)ChoosePageEnum.characterPage)
             {   
-                choose_bound_list = DrawChoosePage.Draw(b, x_pos, y_pos, ui_width, ui_height, data.npc_data);
+                choose_bound_list = DrawChoosePage.Draw(b, x_pos, y_pos, ui_width, ui_height, modData.npc_data);
             }
-            else if (choose_page_index == (int)ChoosePageEnum.locationPage)
+            else if (choosePageIndex == (int)ChoosePageEnum.locationPage)
             {
                 Game1.DrawBox(x_pos, y_pos, ui_width, ui_height);
                 SpriteText.drawStringWithScrollCenteredAt(b, Translations.GetStr("ChoosePage", "Title"), base.xPositionOnScreen + base.width / 2, base.yPositionOnScreen - 64);
-                action_bar.Draw(b, page_index);
-                choose_bound_list = DrawChoosePage.Draw(b, x_pos, y_pos, ui_width, ui_height, location_display_index, new_plan.npc == "" ? data.location_data : pririoty_location);
+                action_bar.Draw(b, pageIndex);
+                choose_bound_list = DrawChoosePage.Draw(b, x_pos, y_pos, ui_width, ui_height, location_display_index, new_plan.npc == "" ? modData.location_data : pririoty_location);
                 updown_button = new PageButton(choose_bound_list[0].X + ui_width + 16, choose_bound_list[0].Y, ui_width, Game1.tileSize * 6, Game1.tileSize * 6);
                 updown_button.DrawUpButton(b);
                 updown_button.DrawDownButton(b);
             }
-            else if (choose_page_index == (int)ChoosePageEnum.actionPage)
+            else if (choosePageIndex == (int)ChoosePageEnum.actionPage)
             {
                 Game1.DrawBox(x_pos, y_pos, ui_width, ui_height);
                 SpriteText.drawStringWithScrollCenteredAt(b, Translations.GetStr("ChoosePage", "Title"), base.xPositionOnScreen + base.width / 2, base.yPositionOnScreen - 64);
-                action_bar.Draw(b, page_index);
+                action_bar.Draw(b, pageIndex);
                 choose_bound_dict = DrawChoosePage.Draw(b, x_pos, y_pos, ui_width, ui_height, new_plan.npc != "");
             }
-            else if(choose_page_index == (int)ChoosePageEnum.timePage)
+            else if(choosePageIndex == (int)ChoosePageEnum.timePage)
             {
                 int x = x_pos - Game1.tileSize / 2;
                 int y = y_pos;
@@ -196,7 +204,7 @@ public class WypMenu : IClickableMenu
                 int[] widths = {32, 64, 32, 96};
                 Game1.DrawBox(x, y, width, height);
                 SpriteText.drawStringWithScrollCenteredAt(b, Translations.GetStr("ChoosePage", "Title"), base.xPositionOnScreen + base.width / 2, base.yPositionOnScreen - 64);
-                action_bar.Draw(b, page_index);
+                action_bar.Draw(b, pageIndex);
                 b.DrawString(font, Translations.GetStr("ChooseDate.StartDate"), new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year")).X) * 3 / 4, y + action_bar_height), Color.Black);
                 b.DrawString(font, Translations.GetStr("ChooseDate.EndDate"), new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year")).X) * 3 / 4, y + action_bar_height + Game1.tileSize * 2), Color.Black);
                 b.DrawString(font, Translations.GetStr("ChooseDate.Repeat"), new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year")).X) * 3 / 4, y + action_bar_height + Game1.tileSize * 4), Color.Black);
@@ -229,11 +237,11 @@ public class WypMenu : IClickableMenu
                     button.Draw(b);
                 }
             }
-            else if (choose_page_index == (int)ChoosePageEnum.itemPage)
+            else if (choosePageIndex == (int)ChoosePageEnum.itemPage)
             {
                 Game1.DrawBox(x_pos, y_pos, ui_width, ui_height);
                 SpriteText.drawStringWithScrollCenteredAt(b, Translations.GetStr("ChoosePage", "Title"), base.xPositionOnScreen + base.width / 2, base.yPositionOnScreen - 64);
-                action_bar.Draw(b, page_index);
+                action_bar.Draw(b, pageIndex);
                 item_box.Bounds = new Rectangle(x_pos, y_pos + action_bar_height, ui_width, Game1.tileSize);
                 if (new_plan.item != "")
                 {
@@ -260,34 +268,34 @@ public class WypMenu : IClickableMenu
     /// <param name="playSound">Determines whether a sound should be played when the click is registered. Default is true.</param>
     public override void receiveLeftClick(int x, int y, bool playSound = true)
     {
-        if (page_index == (int)PageEnum.mainPage)
+        if (pageIndex == (int)PageEnum.mainPage)
         {
             if (menu_bound.Contains(x, y))
             {
-                plan_count = (y - y_pos - action_bar_height) / bar_height;
+                planIndexOnPage = (y - y_pos - action_bar_height) / bar_height;
                 if (CancelCheck(x, y))
                 {
-                    if (plan_page_index * 5 + plan_count < model_data.plan.Count)
+                    if (planPageIndex * 5 + planIndexOnPage < planData.plan.Count)
                     {
-                        model_data.plan.RemoveAt(plan_page_index * 5 + plan_count);
-                        plan_count = 0;
+                        planData.plan.RemoveAt(planPageIndex * 5 + planIndexOnPage);
+                        planIndexOnPage = 0;
                     }
                 }
                 else
                 {
                     new_plan = new Plan();
-                    if (plan_page_index * 5 + plan_count < model_data.plan.Count)
+                    if (planPageIndex * 5 + planIndexOnPage < planData.plan.Count)
                     {
-                        new_plan.npc = model_data.plan[plan_page_index * 5 + plan_count].npc;
-                        new_plan.location = model_data.plan[plan_page_index * 5 + plan_count].location;
-                        new_plan.action = model_data.plan[plan_page_index * 5 + plan_count].action;
-                        new_plan.time = model_data.plan[plan_page_index * 5 + plan_count].time;
-                        new_plan.title = model_data.plan[plan_page_index * 5 + plan_count].title;
-                        new_plan.repeat = model_data.plan[plan_page_index * 5 + plan_count].repeat;
-                        new_plan.special = model_data.plan[plan_page_index * 5 + plan_count].special;
-                        new_plan.item = model_data.plan[plan_page_index * 5 + plan_count].item;
+                        new_plan.npc = planData.plan[planPageIndex * 5 + planIndexOnPage].npc;
+                        new_plan.location = planData.plan[planPageIndex * 5 + planIndexOnPage].location;
+                        new_plan.action = planData.plan[planPageIndex * 5 + planIndexOnPage].action;
+                        new_plan.time = planData.plan[planPageIndex * 5 + planIndexOnPage].time;
+                        new_plan.title = planData.plan[planPageIndex * 5 + planIndexOnPage].title;
+                        new_plan.repeat = planData.plan[planPageIndex * 5 + planIndexOnPage].repeat;
+                        new_plan.special = planData.plan[planPageIndex * 5 + planIndexOnPage].special;
+                        new_plan.item = planData.plan[planPageIndex * 5 + planIndexOnPage].item;
                     }
-                    page_index = (int)PageEnum.editPage;
+                    pageIndex = (int)PageEnum.editPage;
                 }
             }
             else if (action_bar.OKBound.Contains(x, y))
@@ -298,16 +306,16 @@ public class WypMenu : IClickableMenu
             {
                 exitThisMenu();
             }
-            if (leftright_button.LeftBound.Contains(x, y) && plan_page_index > 0)
+            if (leftright_button.LeftBound.Contains(x, y) && planPageIndex > 0)
             {
-                plan_page_index--;
+                planPageIndex--;
             }
-            if (leftright_button.RightBound.Contains(x, y) && plan_page_index < model_data.plan.Count / 5 && model_data.plan.Count < config.MaxPlan)
+            if (leftright_button.RightBound.Contains(x, y) && planPageIndex < planData.plan.Count / 5 && planData.plan.Count < config.MaxPlan)
             {
-                plan_page_index++;
+                planPageIndex++;
             }
         }
-        else if (page_index == (int)PageEnum.editPage)
+        else if (pageIndex == (int)PageEnum.editPage)
         {
             if (search_box.Bounds.Contains(x, y))
             {
@@ -319,45 +327,45 @@ public class WypMenu : IClickableMenu
                 {
                     new_plan.title = search_box.Text;
                 }
-                if (plan_page_index * 5 + plan_count >= model_data.plan.Count)
+                if (planPageIndex * 5 + planIndexOnPage >= planData.plan.Count)
                 {
-                    model_data.plan.Add(new_plan);
+                    planData.plan.Add(new_plan);
                 }
                 else
                 {
-                    model_data.plan[plan_page_index * 5 + plan_count] = new_plan;
+                    planData.plan[planPageIndex * 5 + planIndexOnPage] = new_plan;
                 }
                 search_box.Release();
-                page_index--;
+                pageIndex--;
             }
             else if (action_bar.BackBound.Contains(x, y))
             {
                 search_box.Release();
-                page_index--;
+                pageIndex--;
             }
-            else if ((choose_page_index = GetChoosePageIndex(x, y)) != -1)
+            else if ((choosePageIndex = GetChoosePageIndex(x, y)) != -1)
             {
-                if (choose_page_index == (int)ChoosePageEnum.locationPage)
+                if (choosePageIndex == (int)ChoosePageEnum.locationPage)
                 {
                     SetDefaultLocation();
                 }
-                if (choose_page_index == (int)ChoosePageEnum.timePage)
+                if (choosePageIndex == (int)ChoosePageEnum.timePage)
                 {
                     SetDefaultTime();
                 }
-                page_index++;
+                pageIndex++;
             }
         }
-        else if (page_index == (int)PageEnum.choosePage)
+        else if (pageIndex == (int)PageEnum.choosePage)
         {
             List<Rectangle> choose_bound = choose_bound_list;
-            if (choose_page_index == (int)ChoosePageEnum.locationPage)
+            if (choosePageIndex == (int)ChoosePageEnum.locationPage)
             {
                 if (updown_button.UpBound.Contains(x, y) && location_display_index > 0)
                 {
                     location_display_index--;
                 }
-                else if (updown_button.DownBound.Contains(x, y) && location_display_index + 6 < data.location_data.Count)
+                else if (updown_button.DownBound.Contains(x, y) && location_display_index + 6 < modData.location_data.Count)
                 {
                     location_display_index++;
                 }
@@ -366,17 +374,17 @@ public class WypMenu : IClickableMenu
                     int idx = (y - choose_bound[0].Y) / Game1.tileSize;
                     new_plan.location = pririoty_location[location_display_index + idx];
                     location_display_index = 0;
-                    page_index--;
+                    pageIndex--;
                 }
                 else if (action_bar.OKBound.Contains(x, y) || action_bar.BackBound.Contains(x, y))
                 {
-                    page_index--;
+                    pageIndex--;
                 }
             }
-            else if (choose_page_index == (int)ChoosePageEnum.characterPage)
+            else if (choosePageIndex == (int)ChoosePageEnum.characterPage)
             {
                 // not safe, but it works.Maybe other data structure can be used to store npc data
-                List<string> keys = data.npc_data.Keys.ToList();
+                List<string> keys = modData.npc_data.Keys.ToList();
                 int i;
                 for (i = 0; i < choose_bound_list.Count; i++)
                 {
@@ -390,20 +398,20 @@ public class WypMenu : IClickableMenu
                         {
                             new_plan.npc = keys[i];
                         }
-                        page_index--;
+                        pageIndex--;
                         break;
                     }
                 }
                 if (i == choose_bound_list.Count)
                 {
-                    page_index--;
+                    pageIndex--;
                 }
             }
-            else if (choose_page_index == (int)ChoosePageEnum.actionPage)
+            else if (choosePageIndex == (int)ChoosePageEnum.actionPage)
             {
                 if (action_bar.OKBound.Contains(x, y) || action_bar.BackBound.Contains(x, y))
                 {
-                    page_index--;
+                    pageIndex--;
                 }
                 else
                 {
@@ -412,30 +420,30 @@ public class WypMenu : IClickableMenu
                         if (pair.Value.Contains(x, y))
                         {
                             new_plan.action = pair.Key;
-                            page_index--;
+                            pageIndex--;
                         }
                     }
                 }
             }
-            else if (choose_page_index == (int)ChoosePageEnum.timePage)
+            else if (choosePageIndex == (int)ChoosePageEnum.timePage)
             {
                 if (action_bar.BackBound.Contains(x, y))
                 {
-                    page_index--;
+                    pageIndex--;
                 }
                 else if (action_bar.OKBound.Contains(x, y))
                 {
                     new_plan.time = Index2TimeString(select_by_arrow_buttons)[0];
                     new_plan.repeat = Index2TimeString(select_by_arrow_buttons)[1];
                     new_plan.special = EncodeSpecialTimeButton(select_buttons, 3);
-                    page_index--;
+                    pageIndex--;
                 }
                 else
                 {
                     TimeButtonCheck(x, y);
                 }
             }
-            else if (choose_page_index == (int)ChoosePageEnum.itemPage)
+            else if (choosePageIndex == (int)ChoosePageEnum.itemPage)
             {
                 if (item_box.Bounds.Contains(x, y))
                 {
@@ -445,12 +453,12 @@ public class WypMenu : IClickableMenu
                 {
                     new_plan.item = item_box.Text;
                     item_box.Release();
-                    page_index--;
+                    pageIndex--;
                 }
                 else if (action_bar.BackBound.Contains(x, y))
                 {
                     item_box.Release();
-                    page_index--;
+                    pageIndex--;
                 }
             }
         }
@@ -462,14 +470,14 @@ public class WypMenu : IClickableMenu
         location_display_index = 0;
         if (new_plan.npc != "")
         {
-            foreach (string location in data.location_data)
+            foreach (string location in modData.location_data)
             {
-                if (data.npc_data[new_plan.npc][0].Contains(location))
+                if (modData.npc_data[new_plan.npc][0].Contains(location))
                     pririoty_location.Add(location);
             }
-            foreach (string location in data.location_data)
+            foreach (string location in modData.location_data)
             {
-                if (!data.npc_data[new_plan.npc][0].Contains(location))
+                if (!modData.npc_data[new_plan.npc][0].Contains(location))
                     pririoty_location.Add(location);
             }
         }
@@ -479,13 +487,13 @@ public class WypMenu : IClickableMenu
     {
         //base.performHoverAction(x, y);
         hover_flags.SetDefaultFlags();
-        if (page_index == (int)PageEnum.mainPage)
+        if (pageIndex == (int)PageEnum.mainPage)
         {
             if (menu_bound.Contains(x, y))
             {
                 hover_flags.MainPage_HoverPlan = true;
-                plan_count = (y - y_pos - action_bar_height) / bar_height;
-                hover_plan = plan_page_index * 5 + plan_count < model_data.plan.Count ? model_data.plan[plan_page_index * 5 + plan_count] : new();
+                planIndexOnPage = (y - y_pos - action_bar_height) / bar_height;
+                hover_plan = planPageIndex * 5 + planIndexOnPage < planData.plan.Count ? planData.plan[planPageIndex * 5 + planIndexOnPage] : new();
             }
             else
             {
@@ -493,7 +501,7 @@ public class WypMenu : IClickableMenu
                 hover_plan = new();
             }
         }
-        else if (page_index == (int)PageEnum.editPage)
+        else if (pageIndex == (int)PageEnum.editPage)
         {
             if (choose_buttons[3].TextBound.Contains(x, y))
             {
@@ -501,21 +509,21 @@ public class WypMenu : IClickableMenu
                 //drawToolTip(b, Translations.GetStr("EditPage.Time.Description"), "", null);
             }
         }
-        else if (page_index == (int)PageEnum.choosePage)
+        else if (pageIndex == (int)PageEnum.choosePage)
         {
-            if (choose_page_index == (int)ChoosePageEnum.locationPage)
+            if (choosePageIndex == (int)ChoosePageEnum.locationPage)
             {
 
             }
-            else if (choose_page_index == (int)ChoosePageEnum.characterPage)
+            else if (choosePageIndex == (int)ChoosePageEnum.characterPage)
             {
 
             }
-            else if (choose_page_index == (int)ChoosePageEnum.actionPage)
+            else if (choosePageIndex == (int)ChoosePageEnum.actionPage)
             {
 
             }
-            else if (choose_page_index == (int)ChoosePageEnum.timePage)
+            else if (choosePageIndex == (int)ChoosePageEnum.timePage)
             {
 
             }
@@ -523,7 +531,7 @@ public class WypMenu : IClickableMenu
     }
     private void DrawHoverAction(SpriteBatch b)
     {
-        if (page_index == (int)PageEnum.mainPage)
+        if (pageIndex == (int)PageEnum.mainPage)
         {
             if (hover_flags.MainPage_HoverPlan)
             {
@@ -539,7 +547,7 @@ public class WypMenu : IClickableMenu
                 }
             }
         }
-        else if (page_index == (int)PageEnum.editPage)
+        else if (pageIndex == (int)PageEnum.editPage)
         {
             if (hover_flags.TimePage_HoverTime)
             {
@@ -550,21 +558,21 @@ public class WypMenu : IClickableMenu
                 }
             }
         }
-        else if (page_index == (int)PageEnum.choosePage)
+        else if (pageIndex == (int)PageEnum.choosePage)
         {
-            if (choose_page_index == (int)ChoosePageEnum.locationPage)
+            if (choosePageIndex == (int)ChoosePageEnum.locationPage)
             {
 
             }
-            else if (choose_page_index == (int)ChoosePageEnum.characterPage)
+            else if (choosePageIndex == (int)ChoosePageEnum.characterPage)
             {
 
             }
-            else if (choose_page_index == (int)ChoosePageEnum.actionPage)
+            else if (choosePageIndex == (int)ChoosePageEnum.actionPage)
             {
 
             }
-            else if (choose_page_index == (int)ChoosePageEnum.timePage)
+            else if (choosePageIndex == (int)ChoosePageEnum.timePage)
             {
 
             }

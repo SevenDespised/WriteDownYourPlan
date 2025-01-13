@@ -12,9 +12,9 @@ public class ModEntry: Mod
     public static IModHelper Helper1 {get; internal set;} = null!;
     public static IMonitor Monitor1 {get; internal set;} = null!;
     private ModConfig? Config;
-    public PlanData? model = null;
-    public ModData? data;
-    public Reminder? reminder;
+    public PlanData? planData = null;
+    public ModData? modData;
+    public Reminder? reminderForHud;
     //以下用于存储数据和调试
     public TestCla1 cla = new();
 
@@ -41,13 +41,13 @@ public class ModEntry: Mod
 
     private void OnTimeChanged(object? sender, TimeChangedEventArgs e)
     {
-        if (reminder == null || reminder.RemindMessages == null || !(Config ?? new ModConfig()).DisplayHUDMessage)
+        if (reminderForHud == null || reminderForHud.RemindMessages == null || !(Config ?? new ModConfig()).DisplayHUDMessage)
         {
             return;
         }
-        for (int i = 0; i < reminder.RemindMessages.Count; i++)
+        for (int i = 0; i < reminderForHud.RemindMessages.Count; i++)
         {
-            var remindeMessage = reminder.RemindMessages[i];
+            var remindeMessage = reminderForHud.RemindMessages[i];
             foreach (var message in remindeMessage)
             {
                 if (message.RemindTime != 0)
@@ -65,13 +65,13 @@ public class ModEntry: Mod
     private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
     {
         //model = Helper.Data.ReadJsonFile<PlanData>("data/plandata.json") ?? new PlanData();
-        data = Helper.Data.ReadJsonFile<ModData>("data/data.json") ?? new ModData();
+        modData = Helper.Data.ReadJsonFile<ModData>("data/data.json") ?? new ModData();
         if(Context.IsMainPlayer)
         {
-            model = Helper.Data.ReadSaveData<PlanData>("plandata") ?? new PlanData();
+            planData = Helper.Data.ReadSaveData<PlanData>("plandata") ?? new PlanData();
             Monitor.Log("Model is loaded!", LogLevel.Debug);
-            reminder = new Reminder(model, data);
-            reminder.InitReminder();
+            reminderForHud = new Reminder(planData, modData);
+            reminderForHud.InitReminder();
             Monitor.Log("Reminder is initialized!(host)", LogLevel.Debug);
         }
         TimeList.Init();
@@ -91,7 +91,7 @@ public class ModEntry: Mod
         else if ((Config ?? new ModConfig()).SaveModelButton.JustPressed() && Game1.activeClickableMenu is WypMenu)
         {
             SaveDataToJson();
-            HideWypMenu();
+            ToggleMenu();
         }
 
         //以下用于存储数据和调试
@@ -116,7 +116,7 @@ public class ModEntry: Mod
     {
         if (!Context.IsMainPlayer)
         {
-            Helper.Multiplayer.SendMessage(model, "PlanData", modIDs: new[] { ModManifest.UniqueID }, playerIDs: new[] { Game1.MasterPlayer.UniqueMultiplayerID });
+            Helper.Multiplayer.SendMessage(planData, "PlanData", modIDs: new[] { ModManifest.UniqueID }, playerIDs: new[] { Game1.MasterPlayer.UniqueMultiplayerID });
             Monitor.Log("Sent PlanData to host", LogLevel.Debug);
         }
         else
@@ -145,13 +145,13 @@ public class ModEntry: Mod
         {
             if (e.FromModID == ModManifest.UniqueID && e.Type == "PlanData")
             {
-                model ??= e.ReadAs<PlanData>();
+                planData ??= e.ReadAs<PlanData>();
                 Monitor.Log("Received PlanData from host", LogLevel.Debug);
-                if (data != null)
+                if (modData != null)
                 {
-                    reminder = new Reminder(model, data);
-                    reminder.InitReminder();
-                    Monitor.Log("Reminder is initialized!(host)", LogLevel.Debug);
+                    reminderForHud = new Reminder(planData, modData);
+                    reminderForHud.InitReminder();
+                    Monitor.Log("Reminder is initialized!(client)", LogLevel.Debug);
                 }
             }
         }
@@ -160,6 +160,7 @@ public class ModEntry: Mod
     {
         if (Game1.activeClickableMenu is WypMenu)
         {
+            reminderForHud?.UpdateReminder();
             HideWypMenu();
         }
         else if (Game1.activeClickableMenu == null && Context.IsPlayerFree)
@@ -175,16 +176,16 @@ public class ModEntry: Mod
     }
     private void ShowWypMenu()
     {
-        Game1.activeClickableMenu = new WypMenu(model ?? new PlanData(), data ?? new ModData(), Config ?? new ModConfig());
+        Game1.activeClickableMenu = new WypMenu(planData ?? new PlanData(), modData ?? new ModData(), Config ?? new ModConfig());
     }
     public void SaveData()
     {
         //Helper.Data.WriteSaveData<PlanData>("plandata", null);
-        Helper.Data.WriteSaveData("plandata", model);
+        Helper.Data.WriteSaveData("plandata", planData);
     }
     public void SaveDataToJson()
     {
-        Helper.Data.WriteJsonFile("data/" + Constants.SaveFolderName + ".json", model);
+        Helper.Data.WriteJsonFile("data/" + Constants.SaveFolderName + ".json", planData);
     }
     public void DeleteSaveData()
     {
@@ -197,12 +198,12 @@ public class ModEntry: Mod
     //以下用于存储数据和调试
     private void Debug()
     {
-        data = Helper.Data.ReadJsonFile<ModData>("data/data1.json") ?? new ModData();
+        modData = Helper.Data.ReadJsonFile<ModData>("data/data1.json") ?? new ModData();
         //Monitor.Log(data.location_data["Mine"]);
     }
     public object Test()
     {
-        WypMenu wypMenu = new(model ?? new PlanData(), data ?? new ModData(), Config ?? new ModConfig());
+        WypMenu wypMenu = new(planData ?? new PlanData(), modData ?? new ModData(), Config ?? new ModConfig());
         Dictionary<string, HashSet<string>> res = new();
         Dictionary<string, string> schedule = new();
 
