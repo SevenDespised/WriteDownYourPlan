@@ -8,10 +8,10 @@ namespace WritedownYourPlan.src;
 public sealed class ModConfig
 {
     public KeybindList DisplayWYPButton { get; set; } = new(SButton.F2);
-    public KeybindList DisplayOnUIButton { get; set; } = KeybindList.Parse($"{SButton.LeftShift} + {SButton.G}");
     public KeybindList SaveModelButton { get; set; } = KeybindList.Parse($"{SButton.LeftShift} + {SButton.F2}");
     public int MaxPlan { get; set; } = 20;
     public bool ReadDatatFromJson { get; set; } = false;
+    public bool DisplayHUDMessage { get; set; } = true;
 }
 
 public class TestCla1

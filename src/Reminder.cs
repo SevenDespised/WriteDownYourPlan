@@ -7,8 +7,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace WritedownYourPlan.src;
 public class Reminder
 {
-    PlanData model;
-    ModData modData;
+    readonly PlanData model;
+    readonly ModData modData;
     private List<List<RemindMessage>>? remindMessages = null;
     //generate attribute of remind message
     public List<List<RemindMessage>>? RemindMessages

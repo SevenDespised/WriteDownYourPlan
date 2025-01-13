@@ -17,6 +17,7 @@ public class WypMenu : IClickableMenu
 {
     public PlanData model_data;
     public ModData data;
+    public ModConfig config;
     public readonly LoadData loaddata = new();
     public readonly int x_pos = (int)(Game1.viewport.Width * Game1.options.zoomLevel * (1 / Game1.options.uiScale)) / 2 - Game1.tileSize * 6 / 2;
     public readonly int y_pos = (int)(Game1.viewport.Height * Game1.options.zoomLevel * (1 / Game1.options.uiScale)) / 2 - Game1.tileSize * 6 / 2 - Game1.tileSize;
@@ -76,11 +77,12 @@ public class WypMenu : IClickableMenu
     /// - Initializing choose buttons for selecting various attributes such as NPC, location, and actions.
     /// - Setting up additional buttons for the time selection page.
     /// </remarks>
-    public WypMenu(PlanData Model, ModData Data)
+    public WypMenu(PlanData Model, ModData Data, ModConfig Config)
     {
         initialize(x_pos, y_pos, ui_width, ui_height);
         model_data = Model;
         data = Data;
+        config = Config;
         menu_bound = new Rectangle(x_pos, y_pos + action_bar_height, ui_width, ui_height - action_bar_height);
         search_box = new SearchBox(null, null, Game1.smallFont, Color.Black, Translations.GetStr("EditPage.EditTitle"));
         item_box = new SearchBox(null, null, Game1.smallFont, Color.Black, Translations.GetStr("ChooseItem.EditItem"));
@@ -129,7 +131,7 @@ public class WypMenu : IClickableMenu
             action_bar.Draw(b, page_index);
             if (plan_page_index > 0)
                 leftright_button.DrawLeftButton(b);
-            if (plan_page_index < model_data.plan.Count / 5 && model_data.plan.Count < model_data.max_plan)
+            if (plan_page_index < model_data.plan.Count / 5 && model_data.plan.Count < config.MaxPlan)
                 leftright_button.DrawRightButton(b);
             
             for (int i = 0; i < 5; i++)
@@ -300,7 +302,7 @@ public class WypMenu : IClickableMenu
             {
                 plan_page_index--;
             }
-            if (leftright_button.RightBound.Contains(x, y) && plan_page_index < model_data.plan.Count / 5 && model_data.plan.Count < model_data.max_plan)
+            if (leftright_button.RightBound.Contains(x, y) && plan_page_index < model_data.plan.Count / 5 && model_data.plan.Count < config.MaxPlan)
             {
                 plan_page_index++;
             }

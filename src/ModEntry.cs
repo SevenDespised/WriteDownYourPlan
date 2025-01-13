@@ -41,7 +41,7 @@ public class ModEntry: Mod
 
     private void OnTimeChanged(object? sender, TimeChangedEventArgs e)
     {
-        if (reminder == null || reminder.RemindMessages == null)
+        if (reminder == null || reminder.RemindMessages == null || !(Config ?? new ModConfig()).DisplayHUDMessage)
         {
             return;
         }
@@ -79,7 +79,7 @@ public class ModEntry: Mod
     private void OnWindowResized(object? sender, WindowResizedEventArgs e)
     {
         if (Game1.activeClickableMenu is WypMenu)
-            Game1.activeClickableMenu = new WypMenu(model ?? new PlanData(), data ?? new ModData());
+            ShowWypMenu();
     }
     private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
     {
@@ -97,7 +97,7 @@ public class ModEntry: Mod
         //以下用于存储数据和调试
         else if (e.Button == SButton.F5 && Game1.activeClickableMenu is WypMenu)
         {
-            debug();
+            Debug();
             cla.res = (Dictionary<string, HashSet<string>>)Test();
             //WriteJson("data/npc.json", cla);
             //HideWypMenu();
@@ -175,7 +175,7 @@ public class ModEntry: Mod
     }
     private void ShowWypMenu()
     {
-        Game1.activeClickableMenu = new WypMenu(model ?? new PlanData(), data ?? new ModData());
+        Game1.activeClickableMenu = new WypMenu(model ?? new PlanData(), data ?? new ModData(), Config ?? new ModConfig());
     }
     public void SaveData()
     {
@@ -195,14 +195,14 @@ public class ModEntry: Mod
 
 
     //以下用于存储数据和调试
-    private void debug()
+    private void Debug()
     {
         data = Helper.Data.ReadJsonFile<ModData>("data/data1.json") ?? new ModData();
         //Monitor.Log(data.location_data["Mine"]);
     }
     public object Test()
     {
-        WypMenu wypMenu = new(model ?? new PlanData(), data ?? new ModData());
+        WypMenu wypMenu = new(model ?? new PlanData(), data ?? new ModData(), Config ?? new ModConfig());
         Dictionary<string, HashSet<string>> res = new();
         Dictionary<string, string> schedule = new();
 
