@@ -59,7 +59,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Alex": [[
@@ -75,7 +75,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Caroline": [[
@@ -91,7 +91,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Clint": [[
@@ -107,7 +107,7 @@
             "Build",
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Demetrius": [[
@@ -122,7 +122,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Dwarf": [
@@ -132,7 +132,7 @@
             "Build",
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Elliott": [[
@@ -149,7 +149,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Emily": [[
@@ -166,7 +166,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Evelyn": [[
@@ -179,7 +179,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "George": [[
@@ -193,19 +193,19 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Gil": [[],      
         [
             "Talk",
-            "Task"
+            "Quest"
         ]
         ],
         "Gunther": [[],
         [
             "Talk",
-            "Task"
+            "Quest"
         ]
         ],
         "Gus": [[
@@ -220,7 +220,7 @@
             "Buy",
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Haley": [[
@@ -236,7 +236,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Harvey": [[
@@ -253,7 +253,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Jas": [[
@@ -268,7 +268,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Jodi": [[
@@ -285,7 +285,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Kent": [[
@@ -300,7 +300,7 @@
             "Build",
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Krobus": [[],
@@ -308,7 +308,7 @@
         "Buy",
         "Talk",
         "Gift",
-        "Task"
+        "Quest"
         ]
         ],
         "Leah": [[
@@ -324,7 +324,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Leo": [[
@@ -336,7 +336,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Lewis": [[
@@ -358,7 +358,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Linus": [[
@@ -373,14 +373,14 @@
             "Buy",
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Marlon": [[],
         [
         "Buy",
         "Talk",
-        "Task"
+        "Quest"
         ]],
         "Marnie": [[
         "AnimalShop",
@@ -394,7 +394,7 @@
             "Buy",
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Maru": [[
@@ -410,13 +410,13 @@
             "Buy",
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Mister Qi": [[],
         [
         "Talk",
-        "Task"
+        "Quest"
         ]
         ],
         "Pam": [[
@@ -431,7 +431,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Penny": [[
@@ -449,7 +449,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Pierre": [[
@@ -461,7 +461,7 @@
             "Buy",
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Robin": [[
@@ -480,7 +480,7 @@
             "Build",
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Sam": [[
@@ -496,7 +496,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Sandy": [[
@@ -507,7 +507,7 @@
             "Buy",
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Sebastian": [[
@@ -525,7 +525,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Shane": [[
@@ -541,7 +541,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Vincent": [[
@@ -555,7 +555,7 @@
         [
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Willy": [[
@@ -570,7 +570,7 @@
             "Buy",
             "Talk",
             "Gift",
-            "Task"
+            "Quest"
         ]
         ],
         "Wizard": [[],
@@ -578,7 +578,7 @@
         "Build",
         "Talk",
         "Gift",
-        "Task"
+        "Quest"
         ]]
     }
 }

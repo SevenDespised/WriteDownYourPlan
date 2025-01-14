@@ -68,6 +68,7 @@ public class ModEntry: Mod
         modData = Helper.Data.ReadJsonFile<ModData>("data/data.json") ?? new ModData();
         if(Context.IsMainPlayer)
         {
+            //DeleteSaveData();
             planData = Helper.Data.ReadSaveData<PlanData>("plandata") ?? new PlanData();
             Monitor.Log("Model is loaded!", LogLevel.Debug);
             reminderForHud = new Reminder(planData, modData);

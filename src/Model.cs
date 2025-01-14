@@ -83,7 +83,6 @@ public sealed class Time
 public sealed class PlanData
 {
     public List<Plan> plan = new();
-    public int max_plan = 20;
 }
 
 public sealed class ModData

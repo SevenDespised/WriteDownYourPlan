@@ -42,7 +42,7 @@ public class Reminder
     
     public void Draw(SpriteBatch b, int x, int y, int width, int height, int planIndex)
     {
-        if (remindMessages == null || remindMessages[planIndex].Count == 0)
+        if (remindMessages == null || planIndex >= remindMessages.Count ||remindMessages[planIndex].Count == 0)
         {
             return;
         }
@@ -60,7 +60,7 @@ public class Reminder
     {
         remindMessages = null;
     }
-    private List<List<RemindMessage>> GetAllRemindMessages()
+    private List<List<RemindMessage>>? GetAllRemindMessages()
     {
         List<List<RemindMessage>> res = new();
         for (int i = 0; i < planData.plan.Count; i++)
@@ -75,7 +75,7 @@ public class Reminder
             remindMessages.AddRange(DetectPlanContained(plan));
             res.Add(remindMessages);
         }
-        return res;
+        return res.Count == 0 ? null : res;
     }
     //
     private static bool IsContainedByPlan(SDate date, List<SDate> dates)

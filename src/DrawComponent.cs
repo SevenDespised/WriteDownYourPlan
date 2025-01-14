@@ -615,38 +615,38 @@ public class ActionButton
         scale = w / 2 / 10;
         switch (action)
         {
-            case "Foraging":
+            case "Forage":
                 action_texture = new Rectangle(60, 428, 10, 10);
                 break;
             case "Combat":
                 action_texture = new Rectangle(40, 428, 10, 10);
                 break;
-            case "Fishing":
+            case "Fish":
                 action_texture = new Rectangle(20, 428, 10, 10);
                 break;
-            case "Mining":
+            case "Mine":
                 action_texture = new Rectangle(30, 428, 10, 10);
                 break;
-            case "Farming":
+            case "Farm":
                 action_texture = new Rectangle(10, 428, 10, 10);
                 break;
-            case "Donating":
+            case "Donate":
                 action_texture = new Rectangle(294, 392, 16, 16);
                 scale = w / 2 / 16;
                 break;
-            case "Talking":
+            case "Talk":
                 action_texture = new Rectangle(66, 4, 14, 12);
                 break;
-            case "Gifting":
+            case "Gift":
                 action_texture = new Rectangle(229, 410, 14, 14);
                 break;
-            case "Buying":
+            case "Buy":
                 action_texture = new Rectangle(281, 412, 14, 14);
                 break;
-            case "Building":
+            case "Build":
                 action_texture = new Rectangle(369, 376, 10, 10);
                 break;
-            case "Questing":
+            case "Quest":
                 action_texture = new Rectangle(403, 496, 5, 14);
                 break;
             default:
@@ -735,20 +735,20 @@ public class DrawChoosePage
         //List<string> actions2 = new() { "Foraging", "Combat", "Fishing", "Mining", "Farming", "Donating" };
         if (is_portrait_chosen)
         {
-            action_buttons.Add(new ActionButton(x + width / 4 - 32,  y + Game1.tileSize * 2, 64, 64, "Talking"));
-            action_buttons.Add(new ActionButton(x + width * 3 / 4 - 16,  y + Game1.tileSize * 2, 64, 64, "Gifting"));
-            action_buttons.Add(new ActionButton(x + width / 4 - 32, y + height / 2, 64, 64, "Buying"));
-            action_buttons.Add(new ActionButton(x + width * 3 / 4 - 16, y + height / 2, 64, 64, "Building"));
-            action_buttons.Add(new ActionButton(x + width / 4 - 32, y + height - Game1.tileSize * 2, 64, 64, "Questing"));
+            action_buttons.Add(new ActionButton(x + width / 4 - 32,  y + Game1.tileSize * 2, 64, 64, "Talk"));
+            action_buttons.Add(new ActionButton(x + width * 3 / 4 - 16,  y + Game1.tileSize * 2, 64, 64, "Gift"));
+            action_buttons.Add(new ActionButton(x + width / 4 - 32, y + height / 2, 64, 64, "Buy"));
+            action_buttons.Add(new ActionButton(x + width * 3 / 4 - 16, y + height / 2, 64, 64, "Build"));
+            action_buttons.Add(new ActionButton(x + width / 4 - 32, y + height - Game1.tileSize * 2, 64, 64, "Quest"));
         }
         else
         {
-            action_buttons.Add(new ActionButton(x + width / 4 - 32, y + Game1.tileSize * 2, 64, 64, "Foraging"));
+            action_buttons.Add(new ActionButton(x + width / 4 - 32, y + Game1.tileSize * 2, 64, 64, "Forage"));
             action_buttons.Add(new ActionButton(x + width * 3 / 4 - 16, y + Game1.tileSize * 2, 64, 64, "Combat"));
-            action_buttons.Add(new ActionButton(x + width / 4 - 32, y + height / 2, 64, 64, "Fishing"));
-            action_buttons.Add(new ActionButton(x + width * 3 / 4 - 16, y + height / 2, 64, 64, "Mining"));
-            action_buttons.Add(new ActionButton(x + width / 4 - 32, y + height - Game1.tileSize * 2, 64, 64, "Farming"));
-            action_buttons.Add(new ActionButton(x + width * 3 / 4 - 16, y + height - Game1.tileSize * 2, 64, 64, "Donating"));
+            action_buttons.Add(new ActionButton(x + width / 4 - 32, y + height / 2, 64, 64, "Fish"));
+            action_buttons.Add(new ActionButton(x + width * 3 / 4 - 16, y + height / 2, 64, 64, "Mine"));
+            action_buttons.Add(new ActionButton(x + width / 4 - 32, y + height - Game1.tileSize * 2, 64, 64, "Farm"));
+            action_buttons.Add(new ActionButton(x + width * 3 / 4 - 16, y + height - Game1.tileSize * 2, 64, 64, "Donate"));
         }
         foreach (var button in action_buttons)
         {

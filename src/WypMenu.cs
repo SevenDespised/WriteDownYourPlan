@@ -31,7 +31,7 @@ public class WypMenu : IClickableMenu
     Rectangle menu_bound;
     List<Rectangle> choose_bound_list = new();
     Dictionary<string, Rectangle> choose_bound_dict = new();
-    readonly SearchBox search_box;
+    readonly SearchBox titleBox;
     readonly SearchBox item_box;
     readonly ActionBar action_bar;
     PageButton updown_button;
@@ -89,7 +89,7 @@ public class WypMenu : IClickableMenu
         this.modData = modData;
         this.config = config;
         menu_bound = new Rectangle(x_pos, y_pos + action_bar_height, ui_width, ui_height - action_bar_height);
-        search_box = new SearchBox(null, null, Game1.smallFont, Color.Black, Translations.GetStr("EditPage.EditTitle"));
+        titleBox = new SearchBox(null, null, Game1.smallFont, Color.Black, Translations.GetStr("EditPage.EditTitle"));
         item_box = new SearchBox(null, null, Game1.smallFont, Color.Black, Translations.GetStr("ChooseItem.EditItem"));
         action_bar = new ActionBar(x_pos, y_pos, ui_width, action_bar_height);
         leftright_button = new PageButton(x_pos - 32, y_pos, ui_width, ui_height, ui_width + Game1.tileSize);
@@ -158,12 +158,12 @@ public class WypMenu : IClickableMenu
             Game1.DrawBox(x_pos, y_pos, ui_width, ui_height);
             SpriteText.drawStringWithScrollCenteredAt(b, Translations.GetStr("EditPage", "Title"), xPositionOnScreen + base.width / 2, base.yPositionOnScreen - 64);
             action_bar.Draw(b, pageIndex);
-            search_box.Bounds = new Rectangle(x_pos, y_pos + action_bar_height, ui_width, Game1.tileSize);
+            titleBox.Bounds = new Rectangle(x_pos, y_pos + action_bar_height, ui_width, Game1.tileSize);
             if (new_plan.title != "")
             {
-                search_box.SetHoverText(new_plan.title);
+                titleBox.SetHoverText(new_plan.title);
             }
-            search_box.Draw(b);
+            titleBox.Draw(b);
             choose_buttons[0].Draw(b,Translations.GetStr("EditPage.NPC"), Translations.GetNPCName(new_plan.npc));
             choose_buttons[1].Draw(b, Translations.GetStr("EditPage.Location"),  Translations.GetStr("ChooseLocation", new_plan.location));
             choose_buttons[2].Draw(b, Translations.GetStr("EditPage.Action"), Translations.GetStr("ChooseAction", new_plan.action));
@@ -208,7 +208,7 @@ public class WypMenu : IClickableMenu
                 action_bar.Draw(b, pageIndex);
                 b.DrawString(font, Translations.GetStr("ChooseDate.StartDate"), new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year")).X) * 3 / 4, y + action_bar_height), Color.Black);
                 b.DrawString(font, Translations.GetStr("ChooseDate.EndDate"), new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year")).X) * 3 / 4, y + action_bar_height + Game1.tileSize * 2), Color.Black);
-                b.DrawString(font, Translations.GetStr("ChooseDate.Repeat"), new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year")).X) * 3 / 4, y + action_bar_height + Game1.tileSize * 4), Color.Black);
+                //b.DrawString(font, Translations.GetStr("ChooseDate.Repeat"), new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year")).X) * 3 / 4, y + action_bar_height + Game1.tileSize * 4), Color.Black);
                 
                 y += action_bar_height + Game1.tileSize;
                 b.DrawString(font, Translations.GetStr("ChooseDate.Year") + ":", new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year") + ":").X) * 3 / 4, y), Color.Black);
@@ -224,10 +224,6 @@ public class WypMenu : IClickableMenu
                 widths[0] = 56; widths[1] = 56; widths[2] = 56; widths[3] = 56;
                 x += 16;
                 gap = Game1.tileSize;
-                b.DrawString(font, Translations.GetStr("ChooseDate.Year"), new Vector2(x + widths[0] + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year")).X) / 4, y), Color.Black);
-                b.DrawString(font, Translations.GetStr("ChooseDate.Season"), new Vector2(x + widths[0] + widths[1] + gap + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Season")).X) / 4, y), Color.Black);
-                b.DrawString(font, Translations.GetStr("ChooseDate.Week"), new Vector2(x + widths[0] + widths[1] + widths[2] + gap * 2 + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Week")).X) / 4, y), Color.Black);
-                //b.DrawString(font, Translations.GetStr("ChooseDate.Day"), new Vector2(x + widths[0] + widths[1] + widths[2] + widths[3] + gap * 3 + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Day")).X) / 4, y), Color.Black);
             
                 foreach (SelectByArrowButton button in arrowDateButtons)
                 {
@@ -237,6 +233,7 @@ public class WypMenu : IClickableMenu
                 {
                     button.Draw(b);
                 }
+                selectRepeatButton.Draw(b);
             }
             else if (choosePageIndex == (int)ChoosePageEnum.itemPage)
             {
@@ -295,6 +292,7 @@ public class WypMenu : IClickableMenu
                         new_plan.repeat = planData.plan[planPageIndex * 5 + planIndexOnPage].repeat;
                         new_plan.special = planData.plan[planPageIndex * 5 + planIndexOnPage].special;
                         new_plan.item = planData.plan[planPageIndex * 5 + planIndexOnPage].item;
+                        reminder.UpdateReminder();
                     }
                     pageIndex = (int)PageEnum.editPage;
                 }
@@ -318,15 +316,15 @@ public class WypMenu : IClickableMenu
         }
         else if (pageIndex == (int)PageEnum.editPage)
         {
-            if (search_box.Bounds.Contains(x, y))
+            if (titleBox.Bounds.Contains(x, y))
             {
-                search_box.Click();
+                titleBox.Click();
             }
             else if (action_bar.OKBound.Contains(x, y))
             {
-                if (search_box.Text != "")
+                if (titleBox.Text != "")
                 {
-                    new_plan.title = search_box.Text;
+                    new_plan.title = titleBox.Text;
                 }
                 if (planPageIndex * 5 + planIndexOnPage >= planData.plan.Count)
                 {
@@ -336,12 +334,12 @@ public class WypMenu : IClickableMenu
                 {
                     planData.plan[planPageIndex * 5 + planIndexOnPage] = new_plan;
                 }
-                search_box.Release();
+                titleBox.Release();
                 pageIndex--;
             }
             else if (action_bar.BackBound.Contains(x, y))
             {
-                search_box.Release();
+                titleBox.Release();
                 pageIndex--;
             }
             else if ((choosePageIndex = GetChoosePageIndex(x, y)) != -1)
@@ -621,12 +619,12 @@ public class WypMenu : IClickableMenu
         arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + gap * 3, y, widths[2], 32, MaxIndex: 29, Leftright: false));
         arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + widths[2] + gap * 4, y, widths[3], 32, TimeList.Hours, Leftright: false));
         //repeat
-        y += Game1.tileSize * 2;
+        y += Game1.tileSize;
         widths[0] = 56; widths[1] = 56; widths[2] = 56; widths[3] = 56;
         x += 16;
 
         //delete repeat arrow button to add select button
-        selectRepeatButton = new(x, y, 32, 32, "repeat", new List<string> { Translations.GetStr("ChooseDate.Year"), Translations.GetStr("ChooseDate.Season"), Translations.GetStr("ChooseDate.Week"), Translations.GetStr("ChooseDate.Day")});
+        selectRepeatButton = new(x, y, 32, 32, Translations.GetStr("ChooseDate.Repeat"), new List<string> { Translations.GetStr("ChooseDate.Year"), Translations.GetStr("ChooseDate.Season"), Translations.GetStr("ChooseDate.Week"), Translations.GetStr("ChooseDate.Day")});
         selectSpecialDayButtons.Add(new SelectButton(x, y + Game1.tileSize + Game1.tileSize / 8, 32, 32, Translations.GetStr("ChooseDate.Weather") + ":", new List<string> { Translations.GetStr("ChooseDate.Weather.Sunny"), Translations.GetStr("ChooseDate.Weather.Rainy") }));
         selectSpecialDayButtons.Add(new SelectButton(x, y + Game1.tileSize * 3 / 2 + Game1.tileSize / 8, 32, 32, Translations.GetStr("ChooseDate.Luck") + ":", new List<string> {Translations.GetStr("ChooseDate.Luck.Lucky"), Translations.GetStr("ChooseDate.Luck.Unlucky")}));
     }
