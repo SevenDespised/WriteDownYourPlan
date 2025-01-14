@@ -103,7 +103,7 @@ public class Reminder
         }
         if(dates[1] < SDate.Now())
         {
-            //res.Add(new RemindMessage(reminderEndKey, null, 610));
+            //res.Add(new RemindMessage());
             return res;
         }
         if(dates[0] < SDate.Now())
@@ -133,7 +133,7 @@ public class Reminder
             string season = Regex.Replace(festival.Key, digitsPattern, "");
             int day = int.Parse(Regex.Replace(festival.Key, lettersPattern, ""));
             SDate festivalDate = new(day, season, SDate.Now().Year > dates[0].Year ? SDate.Now().Year : dates[0].Year);
-            //fist check year, second check year + 1 
+            //fist check year, second check (year + 1)
             List<SDate> datesForCheck = nowToEndDates?? dates;
             if (IsContainedByPlan(festivalDate, datesForCheck) || IsContainedByPlan(festivalDate, datesForCheck.Select(d => new SDate(d.Day, d.Season, d.Year + 1)).ToList()))
             {
@@ -158,7 +158,6 @@ public class Reminder
     }
     private List<RemindMessage> DetectDate(Plan plan)
     {
-        //todo: fix start detection bug, bug is about repeat check
         List<RemindMessage> res = new();
         List<SDate>? dates = TimeUtils.DateParse(plan.time, out int[] time);;
         string timeString = "";
@@ -186,11 +185,13 @@ public class Reminder
         if (plan.repeat != "")
         {
             string[] repeatIndex = TimeUtils.RepeatParse(plan.repeat, out bool[] repeat);
-            int[] nowParse = TimeUtils.SDate2Index4Repeat(now);
-            bool isRepeatToday = true;
-            foreach (bool b in repeat)
+            int[] nowIndex = TimeUtils.SDate2Index4Repeat(now);
+            //if no "per" is selected, plan will not be reminded repeatedly
+            bool isRepeatToday = repeat[0] || repeat[1] || repeat[2] || repeat[3];
+            for (int i = 0; i < repeat.Length; i++)
             {
-                if (!b && nowParse[0] != int.Parse(repeatIndex[0]))
+                bool b = repeat[i];
+                if (!b && nowIndex[i] != int.Parse(repeatIndex[i]))
                 {
                     isRepeatToday = false;
                     break;
@@ -208,7 +209,7 @@ public class Reminder
         //festival
         if (Utility.isFestivalDay() || Utility.IsPassiveFestivalDay())
         {
-            res.Add(new RemindMessage(reminderFestivalKey, null, 610));
+            res.Add(new RemindMessage(reminderFestivalKey, null, 630));
         }
 
         //birthday
@@ -261,13 +262,13 @@ public class Reminder
             case Game1.weather_rain:
                 if (stateIndex[0] == 2)
                 {
-                    res.Add(new RemindMessage(reminderRainKey, null, 610));
+                    res.Add(new RemindMessage(reminderRainKey, null, 630));
                 }
                 break;
             default:
                 if (stateIndex[0] == 1)
                 {
-                    res.Add(new RemindMessage(reminderNorainKey, null, 610));
+                    res.Add(new RemindMessage(reminderNorainKey, null, 630));
                 }
                 break;
         }
@@ -275,14 +276,14 @@ public class Reminder
         {
             if (stateIndex[1] == 1)
             {
-                res.Add(new RemindMessage(reminderLuckyKey, null, 610));
+                res.Add(new RemindMessage(reminderLuckyKey, null, 630));
             }
         }
         else
         {
             if (stateIndex[1] == 2)
             {
-                res.Add(new RemindMessage(reminderUnluckyKey, null, 610));
+                res.Add(new RemindMessage(reminderUnluckyKey, null, 630));
             }
         }
         return res;

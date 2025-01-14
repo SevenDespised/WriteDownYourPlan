@@ -794,7 +794,7 @@ public class DrawReminder
         int num1 = 0;
         for (int i = 0; i < remindMessage.Count; i++)
         {
-            num1 += DrawMultilineString(b, remindMessage[i].GetRemindMessageDisplay(), Game1.smallFont, x + 16, y + 16 + num1, Color.Black, width - 32);
+            num1 += DrawMultilineString(b, remindMessage[i].GetRemindMessageDisplay(), Game1.smallFont, x + 32, y + 32 + num1, Color.Black, width - 64);
         }
     }
     public static int DrawMultilineString(SpriteBatch b, string text, SpriteFont font, int x, int y, Color color, int line_width = 200)

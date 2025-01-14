@@ -669,7 +669,7 @@ public class WypMenu : IClickableMenu
                 }
             }
         }
-        ModEntry.Monitor1.Log($"special state = {new_plan.special}", LogLevel.Debug);
+        //ModEntry.Monitor1.Log($"special state = {new_plan.special}", LogLevel.Debug);
         DecodeSpecialTimeButton(new_plan.special, select_buttons, 3);
     }
     private void CheckEnableRepeat()
