@@ -158,10 +158,7 @@ public class Reminder
     }
     private List<RemindMessage> DetectDate(Plan plan)
     {
-        //todo: detect time state: start tomorrow, start today, start in two hours, start now
-        //end tomorrow, end today, end in two hours, end now
-        //rainy tomorrow, rainy today, lucky today
-        //festival tomorrow, festival today, birthday tomorrow, birthday today,
+        //todo: fix start detection bug, bug is about repeat check
         List<RemindMessage> res = new();
         List<SDate>? dates = TimeUtils.DateParse(plan.time, out int[] time);;
         string timeString = "";

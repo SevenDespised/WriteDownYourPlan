@@ -128,7 +128,7 @@
     "ReminderMessage.PlanNum": "计划{{num}}消息：",
     "ReminderMessage.Start": "计划已于{{time}}开始！",
     "ReminderMessage.End": "计划已于{{time}}结束！",
-    "ReminderMessage.RepeatStart": "计划已于{{time}}开始！",
+    "ReminderMessage.RepeatStart": "(重复)计划已于{{time}}开始！",
     "ReminderMessage.Festival": "今天有节日！",
     "ReminderMessage.NpcLoc": "现在{{npc}}或许在{{location}}",
     "ReminderMessage.Birthday": "今天是{{npc}}的生日！",
