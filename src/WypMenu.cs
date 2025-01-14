@@ -139,8 +139,8 @@ public class WypMenu : IClickableMenu
             action_bar.Draw(b, pageIndex);
             if (planPageIndex > 0)
                 leftright_button.DrawLeftButton(b);
-            if (planPageIndex < planData.plan.Count / 5 && planData.plan.Count < config.MaxPlan)
-                leftright_button.DrawRightButton(b);
+            if (planPageIndex < planData.plan.Count / 5 && planPageIndex != (config.MaxPlan - 1) / 5)
+                leftright_button.DrawRightButton(b);                     
             
             for (int i = 0; i < 5; i++)
             {
@@ -292,8 +292,8 @@ public class WypMenu : IClickableMenu
                         new_plan.repeat = planData.plan[planPageIndex * 5 + planIndexOnPage].repeat;
                         new_plan.special = planData.plan[planPageIndex * 5 + planIndexOnPage].special;
                         new_plan.item = planData.plan[planPageIndex * 5 + planIndexOnPage].item;
-                        reminder.UpdateReminder();
                     }
+                    reminder.UpdateReminder();
                     pageIndex = (int)PageEnum.editPage;
                 }
             }
@@ -309,7 +309,7 @@ public class WypMenu : IClickableMenu
             {
                 planPageIndex--;
             }
-            if (leftright_button.RightBound.Contains(x, y) && planPageIndex < planData.plan.Count / 5 && planData.plan.Count < config.MaxPlan)
+            if (leftright_button.RightBound.Contains(x, y) && planPageIndex < planData.plan.Count / 5 && planPageIndex != (config.MaxPlan - 1) / 5)
             {
                 planPageIndex++;
             }
@@ -328,7 +328,9 @@ public class WypMenu : IClickableMenu
                 }
                 if (planPageIndex * 5 + planIndexOnPage >= planData.plan.Count)
                 {
-                    planData.plan.Add(new_plan);
+                    //only choosing date is invalid
+                    if(new_plan.title != "" || new_plan.npc != "" || new_plan.location != "" || new_plan.action != "" || new_plan.item != "")
+                        planData.plan.Add(new_plan);
                 }
                 else
                 {
@@ -480,6 +482,13 @@ public class WypMenu : IClickableMenu
                     pririoty_location.Add(location);
             }
         }
+        else
+        {
+            foreach (string location in modData.location_data)
+            {
+                pririoty_location.Add(location);
+            }
+        }
     }
 
     public override void performHoverAction(int x, int y)
@@ -610,13 +619,13 @@ public class WypMenu : IClickableMenu
         //start date
         arrowDateButtons.Add(new SelectByArrowButton(x + gap, y, widths[0], 32, Leftright: false));
         arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + gap * 2, y, widths[1], 32, TimeList.Seasons, Leftright: false));
-        arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + gap * 3, y, widths[2], 32, MaxIndex: 29, Leftright: false));
+        arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + gap * 3, y, widths[2], 32, MaxIndex: 27, Leftright: false));
         arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + widths[2] + gap * 4, y, widths[3], 32, TimeList.Hours, Leftright: false));
         //end date
         y += Game1.tileSize * 2;
         arrowDateButtons.Add(new SelectByArrowButton(x + gap, y, widths[0], 32, Leftright: false));
         arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + gap * 2, y, widths[1], 32, TimeList.Seasons, Leftright: false));
-        arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + gap * 3, y, widths[2], 32, MaxIndex: 29, Leftright: false));
+        arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + gap * 3, y, widths[2], 32, MaxIndex: 27, Leftright: false));
         arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + widths[2] + gap * 4, y, widths[3], 32, TimeList.Hours, Leftright: false));
         //repeat
         y += Game1.tileSize;
@@ -630,15 +639,21 @@ public class WypMenu : IClickableMenu
     }
     private void SetDefaultTime()
     {
+        //if time is not set, set current time as default
         if (new_plan.time == "")
-            foreach (SelectByArrowButton button in arrowDateButtons)
-            {
-                button.Release();
-            }
+        { 
+            arrowDateButtons[0].SetDefaultIndex(SDate.Now().Year - 1);
+            arrowDateButtons[1].SetDefaultIndex(SDate.Now().SeasonIndex);
+            arrowDateButtons[2].SetDefaultIndex(SDate.Now().Day - 1);
+            arrowDateButtons[3].Release();
+            arrowDateButtons[4].SetDefaultIndex(SDate.Now().Year - 1);
+            arrowDateButtons[5].SetDefaultIndex(SDate.Now().SeasonIndex);
+            arrowDateButtons[6].SetDefaultIndex(SDate.Now().Day - 1);
+            arrowDateButtons[7].Release();
+        }
         else
         {
             List<string[]> startend_time = DeadlineSplit(new_plan.time);
-            //CheckEnableRepeat();
             for (int i = 0; i < 8; i++)
             {
                 if (i < 4)

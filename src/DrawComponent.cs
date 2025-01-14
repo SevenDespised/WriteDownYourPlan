@@ -187,6 +187,7 @@ public class PageButton
     {
     }
 }
+//todo: delete all code about repeat
 public class SelectByArrowButton
 {
     readonly int x;

@@ -39,28 +39,7 @@ public class ModEntry: Mod
         //以下用于存储数据和调试
     }
 
-    private void OnTimeChanged(object? sender, TimeChangedEventArgs e)
-    {
-        if (reminderForHud == null || reminderForHud.RemindMessages == null || !(Config ?? new ModConfig()).DisplayHUDMessage)
-        {
-            return;
-        }
-        for (int i = 0; i < reminderForHud.RemindMessages.Count; i++)
-        {
-            var remindeMessage = reminderForHud.RemindMessages[i];
-            foreach (var message in remindeMessage)
-            {
-                if (message.RemindTime != 0)
-                {
-                    if (Game1.timeOfDay == message.RemindTime || (Game1.timeOfDay == 610 && message.RemindTime == 600))
-                    {
-                        string hudText = Translations.GetStr("ReminderMessage", "PlanNum", new {num = i + 1}) + " " + message.GetRemindMessageDisplay();
-                        Game1.addHUDMessage(new HUDMessage(hudText, HUDMessage.newQuest_type));
-                    }
-                }
-            }
-        }
-    }
+
 
     private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
     {
@@ -157,12 +136,35 @@ public class ModEntry: Mod
             }
         }
     }
+    private void OnTimeChanged(object? sender, TimeChangedEventArgs e)
+    {
+        if (reminderForHud == null || reminderForHud.RemindMessages == null || !(Config ?? new ModConfig()).DisplayHUDMessage)
+        {
+            return;
+        }
+        for (int i = 0; i < reminderForHud.RemindMessages.Count; i++)
+        {
+            var remindeMessage = reminderForHud.RemindMessages[i];
+            foreach (var message in remindeMessage)
+            {
+                if (message.RemindTime != 0)
+                {
+                    if (Game1.timeOfDay == message.RemindTime || (Game1.timeOfDay == 610 && message.RemindTime == 600))
+                    {
+                        string hudText = Translations.GetStr("ReminderMessage", "PlanNum", new {num = i + 1}) + " " + message.GetRemindMessageDisplay();
+                        Game1.addHUDMessage(new HUDMessage(hudText, HUDMessage.newQuest_type));
+                    }
+                }
+            }
+        }
+    }
     private void ToggleMenu()
     {
         if (Game1.activeClickableMenu is WypMenu)
         {
-            reminderForHud?.UpdateReminder();
             HideWypMenu();
+            reminderForHud?.UpdateReminder();
+            Monitor.Log("Reminder is updated!", LogLevel.Debug);
         }
         else if (Game1.activeClickableMenu == null && Context.IsPlayerFree)
             ShowWypMenu();
