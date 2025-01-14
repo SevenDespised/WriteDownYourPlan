@@ -38,8 +38,9 @@ public class WypMenu : IClickableMenu
     readonly PageButton leftright_button;
     readonly List<CancelButton> cancel_buttons;
     readonly List<ChooseButton> choose_buttons;
-    readonly List<SelectButton> select_buttons = new();
-    readonly List<SelectByArrowButton> select_by_arrow_buttons = new();
+    SelectButton selectRepeatButton;
+    readonly List<SelectButton> selectSpecialDayButtons = new();
+    readonly List<SelectByArrowButton> arrowDateButtons = new();
     readonly HoverFlags hover_flags = new();
     readonly List<string> time_labels = new()
     {
@@ -228,11 +229,11 @@ public class WypMenu : IClickableMenu
                 b.DrawString(font, Translations.GetStr("ChooseDate.Week"), new Vector2(x + widths[0] + widths[1] + widths[2] + gap * 2 + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Week")).X) / 4, y), Color.Black);
                 //b.DrawString(font, Translations.GetStr("ChooseDate.Day"), new Vector2(x + widths[0] + widths[1] + widths[2] + widths[3] + gap * 3 + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Day")).X) / 4, y), Color.Black);
             
-                foreach (SelectByArrowButton button in select_by_arrow_buttons)
+                foreach (SelectByArrowButton button in arrowDateButtons)
                 {
                     button.Draw(b);
                 }
-                foreach (SelectButton button in select_buttons)
+                foreach (SelectButton button in selectSpecialDayButtons)
                 {
                     button.Draw(b);
                 }
@@ -433,14 +434,14 @@ public class WypMenu : IClickableMenu
                 }
                 else if (action_bar.OKBound.Contains(x, y))
                 {
-                    new_plan.time = Index2TimeString(select_by_arrow_buttons)[0];
-                    new_plan.repeat = Index2TimeString(select_by_arrow_buttons)[1];
-                    new_plan.special = EncodeSpecialTimeButton(select_buttons, 3);
+                    new_plan.time = Index2TimeString(arrowDateButtons);
+                    new_plan.repeat = EncodeRepeatButton(selectRepeatButton);
+                    new_plan.special = EncodeSpecialDateButton(selectSpecialDayButtons, 3);
                     pageIndex--;
                 }
                 else
                 {
-                    TimeButtonCheck(x, y);
+                    DateButtonCheck(x, y);
                 }
             }
             else if (choosePageIndex == (int)ChoosePageEnum.itemPage)
@@ -535,11 +536,11 @@ public class WypMenu : IClickableMenu
         {
             if (hover_flags.MainPage_HoverPlan)
             {
-                List<string>? tmp = TimeString2DisplayText(new List<string>() { hover_plan.time, hover_plan.repeat});
+                string? tmp = TimeString2DisplayText(hover_plan.time);
                 string organized_text = TextUtils.GetOrganizedText(hover_plan); 
                 if (tmp is not null)
                 {
-                    drawToolTip(b, organized_text, tmp[0], null);
+                    drawToolTip(b, organized_text, tmp, null);
                 }
                 else
                 {
@@ -551,10 +552,10 @@ public class WypMenu : IClickableMenu
         {
             if (hover_flags.TimePage_HoverTime)
             {
-                List<string>? tmp = TimeString2DisplayText(new List<string>() { new_plan.time, new_plan.repeat});
+                string? tmp = TimeString2DisplayText(new_plan.time);
                 if (tmp is not null)
                 {
-                    drawToolTip(b, tmp[0], "", null);
+                    drawToolTip(b, tmp, "", null);
                 }
             }
         }
@@ -578,27 +579,28 @@ public class WypMenu : IClickableMenu
             }
         }
     }
-    private void TimeButtonCheck(int x, int y)
+    private void DateButtonCheck(int x, int y)
     {
-        for (int i = 0; i < select_by_arrow_buttons.Count; i++)
+        for (int i = 0; i < arrowDateButtons.Count; i++)
         {
-            SelectByArrowButton button = select_by_arrow_buttons[i];
+            SelectByArrowButton button = arrowDateButtons[i];
             if (button.PageButtonBound[0].Contains(x, y))
             {
                 button.DecreasePage();
-                CheckEnableRepeat();
+                //CheckEnableRepeat();
             }
             else if (button.PageButtonBound[1].Contains(x, y))
             {
                 button.IncreasePage();
-                CheckEnableRepeat();
+                //CheckEnableRepeat();
             }
         }
-        for (int i = 0; i < select_buttons.Count; i++)
+        for (int i = 0; i < selectSpecialDayButtons.Count; i++)
         {
-            SelectButton button = select_buttons[i];
+            SelectButton button = selectSpecialDayButtons[i];
             button.ToggleOption(button.GetClickedOptionIndex(x, y));
         }
+        selectRepeatButton.ToggleOption(selectRepeatButton.GetClickedOptionIndex(x, y));
     }
 
     private void InitTimePageButtons()
@@ -608,91 +610,74 @@ public class WypMenu : IClickableMenu
         int gap = Game1.tileSize * 3 / 4;
         int[] widths = {32, 64, 32, 96};
         //start date
-        select_by_arrow_buttons.Add(new SelectByArrowButton(x + gap, y, widths[0], 32, Leftright: false));
-        select_by_arrow_buttons.Add(new SelectByArrowButton(x + widths[0] + gap * 2, y, widths[1], 32, TimeList.Seasons, Leftright: false));
-        select_by_arrow_buttons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + gap * 3, y, widths[2], 32, MaxIndex: 29, Leftright: false));
-        select_by_arrow_buttons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + widths[2] + gap * 4, y, widths[3], 32, TimeList.Hours, Leftright: false));
+        arrowDateButtons.Add(new SelectByArrowButton(x + gap, y, widths[0], 32, Leftright: false));
+        arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + gap * 2, y, widths[1], 32, TimeList.Seasons, Leftright: false));
+        arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + gap * 3, y, widths[2], 32, MaxIndex: 29, Leftright: false));
+        arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + widths[2] + gap * 4, y, widths[3], 32, TimeList.Hours, Leftright: false));
         //end date
         y += Game1.tileSize * 2;
-        select_by_arrow_buttons.Add(new SelectByArrowButton(x + gap, y, widths[0], 32, Leftright: false));
-        select_by_arrow_buttons.Add(new SelectByArrowButton(x + widths[0] + gap * 2, y, widths[1], 32, TimeList.Seasons, Leftright: false));
-        select_by_arrow_buttons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + gap * 3, y, widths[2], 32, MaxIndex: 29, Leftright: false));
-        select_by_arrow_buttons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + widths[2] + gap * 4, y, widths[3], 32, TimeList.Hours, Leftright: false));
+        arrowDateButtons.Add(new SelectByArrowButton(x + gap, y, widths[0], 32, Leftright: false));
+        arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + gap * 2, y, widths[1], 32, TimeList.Seasons, Leftright: false));
+        arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + gap * 3, y, widths[2], 32, MaxIndex: 29, Leftright: false));
+        arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + widths[2] + gap * 4, y, widths[3], 32, TimeList.Hours, Leftright: false));
         //repeat
         y += Game1.tileSize * 2;
         widths[0] = 56; widths[1] = 56; widths[2] = 56; widths[3] = 56;
         x += 16;
-        gap = Game1.tileSize;
-        select_by_arrow_buttons.Add(new SelectByArrowButton(x, y, widths[0], 32, Leftright: false));
-        select_by_arrow_buttons.Add(new SelectByArrowButton(x + widths[0] + gap, y, widths[1], 32, TimeList.Seasons, Leftright: false));
-        select_by_arrow_buttons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + gap * 2, y, widths[2], 32, MaxIndex: 3, Leftright: false));
-        select_by_arrow_buttons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + widths[2] + gap * 3, y, widths[3], 32, TimeList.Days, Leftright: false));
 
-        select_buttons.Add(new SelectButton(x, y + Game1.tileSize + Game1.tileSize / 8, 32, 32, Translations.GetStr("ChooseDate.Weather") + ":", new List<string> { Translations.GetStr("ChooseDate.Weather.Sunny"), Translations.GetStr("ChooseDate.Weather.Rainy") }));
-        select_buttons.Add(new SelectButton(x, y + Game1.tileSize * 3 / 2 + Game1.tileSize / 8, 32, 32, Translations.GetStr("ChooseDate.Luck") + ":", new List<string> {Translations.GetStr("ChooseDate.Luck.Lucky"), Translations.GetStr("ChooseDate.Luck.Unlucky")}));
+        //delete repeat arrow button to add select button
+        selectRepeatButton = new(x, y, 32, 32, "repeat", new List<string> { Translations.GetStr("ChooseDate.Year"), Translations.GetStr("ChooseDate.Season"), Translations.GetStr("ChooseDate.Week"), Translations.GetStr("ChooseDate.Day")});
+        selectSpecialDayButtons.Add(new SelectButton(x, y + Game1.tileSize + Game1.tileSize / 8, 32, 32, Translations.GetStr("ChooseDate.Weather") + ":", new List<string> { Translations.GetStr("ChooseDate.Weather.Sunny"), Translations.GetStr("ChooseDate.Weather.Rainy") }));
+        selectSpecialDayButtons.Add(new SelectButton(x, y + Game1.tileSize * 3 / 2 + Game1.tileSize / 8, 32, 32, Translations.GetStr("ChooseDate.Luck") + ":", new List<string> {Translations.GetStr("ChooseDate.Luck.Lucky"), Translations.GetStr("ChooseDate.Luck.Unlucky")}));
     }
     private void SetDefaultTime()
     {
         if (new_plan.time == "")
-            foreach (SelectByArrowButton button in select_by_arrow_buttons)
+            foreach (SelectByArrowButton button in arrowDateButtons)
             {
                 button.Release();
             }
         else
         {
             List<string[]> startend_time = DeadlineSplit(new_plan.time);
-            CheckEnableRepeat();
+            //CheckEnableRepeat();
             for (int i = 0; i < 8; i++)
             {
                 if (i < 4)
                 {
-                    select_by_arrow_buttons[i].SetDefaultIndex(int.Parse(startend_time[0][i]));
+                    arrowDateButtons[i].SetDefaultIndex(int.Parse(startend_time[0][i]));
                 }
                 else
                 {
-                    select_by_arrow_buttons[i].SetDefaultIndex(int.Parse(startend_time[1][i - 4]));
-                }
-            }
-            if (new_plan.repeat == "")
-            {
-                for (int i = 8; i < 12; i++)
-                {
-                    select_by_arrow_buttons[i].SetDefaultIndex(int.Parse(select_by_arrow_buttons[i - 8].GetSelectedValue()));
-                }
-            }
-            else
-            {
-                string[] repeat_split = TimeSplit(new_plan.repeat);
-                for (int i = 8; i < 12; i++)
-                {
-                    select_by_arrow_buttons[i].SetDefaultIndex(int.Parse(repeat_split[i - 8]));
+                    arrowDateButtons[i].SetDefaultIndex(int.Parse(startend_time[1][i - 4]));
                 }
             }
         }
+        DecodeRepeatButton(selectRepeatButton, new_plan.repeat);
         //ModEntry.Monitor1.Log($"special state = {new_plan.special}", LogLevel.Debug);
-        DecodeSpecialTimeButton(new_plan.special, select_buttons, 3);
+        DecodeSpecialDateButton(new_plan.special, selectSpecialDayButtons, 3);
     }
     private void CheckEnableRepeat()
     {
-        int start_year = int.Parse(select_by_arrow_buttons[0].GetSelectedValue());
-        int start_season = int.Parse(select_by_arrow_buttons[1].GetSelectedValue());
-        int start_tmp = int.Parse(select_by_arrow_buttons[2].GetSelectedValue());
+        int start_year = int.Parse(arrowDateButtons[0].GetSelectedValue());
+        int start_season = int.Parse(arrowDateButtons[1].GetSelectedValue());
+        int start_tmp = int.Parse(arrowDateButtons[2].GetSelectedValue());
         int start_week = start_tmp / 7 + 1;
         int start_day = start_tmp % 7 + 1;
 
-        int end_year = int.Parse(select_by_arrow_buttons[4].GetSelectedValue());
-        int end_season = int.Parse(select_by_arrow_buttons[5].GetSelectedValue());
-        int end_tmp = int.Parse(select_by_arrow_buttons[6].GetSelectedValue());
+        int end_year = int.Parse(arrowDateButtons[4].GetSelectedValue());
+        int end_season = int.Parse(arrowDateButtons[5].GetSelectedValue());
+        int end_tmp = int.Parse(arrowDateButtons[6].GetSelectedValue());
         int end_week = end_tmp / 7 + 1;
         int end_day = end_tmp % 7 + 1;
 
         for (int i = 0; i < 4; i++)
         {
-            select_by_arrow_buttons[8 + i].SetIsRepeat(true);
+            arrowDateButtons[8 + i].SetIsRepeat(true);
         }
         if (start_year >= end_year)
         {
-            select_by_arrow_buttons[8].SetIsRepeat(false);
+            arrowDateButtons[8].SetIsRepeat(false);
         }
         else
         {
@@ -700,7 +685,7 @@ public class WypMenu : IClickableMenu
         }
         if (start_season >= end_season)
         {
-            select_by_arrow_buttons[9].SetIsRepeat(false);
+            arrowDateButtons[9].SetIsRepeat(false);
         }
         else
         {
@@ -708,7 +693,7 @@ public class WypMenu : IClickableMenu
         }
         if (start_week >= end_week)
         {
-            select_by_arrow_buttons[10].SetIsRepeat(false);
+            arrowDateButtons[10].SetIsRepeat(false);
         }
         else
         {
@@ -716,7 +701,7 @@ public class WypMenu : IClickableMenu
         }
         if (start_day >= end_day)
         {
-            select_by_arrow_buttons[11].SetIsRepeat(false);
+            arrowDateButtons[11].SetIsRepeat(false);
         }
         else
         {

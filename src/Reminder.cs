@@ -158,12 +158,16 @@ public class Reminder
     }
     private List<RemindMessage> DetectDate(Plan plan)
     {
+        List<SDate>? dates = TimeUtils.DateParse(plan.time, out int[] time);
         List<RemindMessage> res = new();
-        List<SDate>? dates = TimeUtils.DateParse(plan.time, out int[] time);;
+        if (dates == null)
+        {
+            return res;
+        }
         string timeString = "";
         SDate now = SDate.Now();
         // compare current time with start time
-        if (dates != null && now == dates[0])
+        if (now == dates[0])
         {
             if (time[0] != 0)
             {
@@ -172,7 +176,7 @@ public class Reminder
             res.Add(new RemindMessage(reminderStartKey, timeString == ""? null : new { time = timeString }, time[0] == 600 ? 610 : time[0]));
             timeString = "";
         }
-        if (dates != null && now == dates[1])
+        if (now == dates[1])
         {
             if (time[1] != 0)
             {
@@ -182,22 +186,13 @@ public class Reminder
             timeString = "";
         }
         //repeat
-        if (plan.repeat != "")
+        if (plan.repeat != -1)
         {
-            string[] repeatIndex = TimeUtils.RepeatParse(plan.repeat, out bool[] repeat);
-            int[] nowIndex = TimeUtils.SDate2Index4Repeat(now);
-            //if no "per" is selected, plan will not be reminded repeatedly
-            bool isRepeatToday = repeat[0] || repeat[1] || repeat[2] || repeat[3];
-            for (int i = 0; i < repeat.Length; i++)
-            {
-                bool b = repeat[i];
-                if (!b && nowIndex[i] != int.Parse(repeatIndex[i]))
-                {
-                    isRepeatToday = false;
-                    break;
-                }
-            }
-            if (isRepeatToday)
+            //year, month, week, day 
+            int[] intervals = new int[4]{112, 28, 7, 1};
+            int interval = now.DaysSinceStart - dates[0].DaysSinceStart;
+            //check if today date is less than or equal to end,  greater than start(not equal, when today is equal to plan start day, add "remindStartKey")
+            if (now <= dates[1] && interval > 0 && interval % intervals[plan.repeat] == 0)
             {
                 if (time[0] != 0)
                 {
@@ -256,7 +251,7 @@ public class Reminder
         double luck = Game1.player.DailyLuck;
 
         //weather and luck
-        int[] stateIndex = TimeUtils.DecodeSpecialTime(plan.special);
+        int[] stateIndex = TimeUtils.DecodeSpecialDate(plan.special);
         switch (weatherToday)
         {
             case Game1.weather_rain:

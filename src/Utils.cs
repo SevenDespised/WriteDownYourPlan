@@ -15,34 +15,23 @@ public static class TimeUtils
     {
         return time.Split(' ');
     }
-    public static List<string> Index2TimeString(List<SelectByArrowButton> select_by_arrow_buttons)
+    public static string Index2TimeString(List<SelectByArrowButton> select_by_arrow_buttons)
     {
-        List<string> time_list = new();
+        //delete about repeat
         string start_date = select_by_arrow_buttons[0].GetSelectedValue() + " " + select_by_arrow_buttons[1].GetSelectedValue() + " " + select_by_arrow_buttons[2].GetSelectedValue() + " " + select_by_arrow_buttons[3].GetSelectedValue();
         string end_date = select_by_arrow_buttons[4].GetSelectedValue() + " " + select_by_arrow_buttons[5].GetSelectedValue() + " " + select_by_arrow_buttons[6].GetSelectedValue() + " " + select_by_arrow_buttons[7].GetSelectedValue();
-        time_list.Add(start_date + "-" + end_date);
-        if  (select_by_arrow_buttons.Count > 8)
-        {
-            string repeat_time = select_by_arrow_buttons[8].GetSelectedValue() + " " + select_by_arrow_buttons[9].GetSelectedValue() + " " + select_by_arrow_buttons[10].GetSelectedValue() + " " + select_by_arrow_buttons[11].GetSelectedValue();
-            time_list.Add(repeat_time);
-        }
-        else
-        {
-            time_list.Add("");
-        }
-
-        return time_list;
+        return start_date + "-" + end_date;
     }
-    public static List<int>? TimeString2Index(List<string> time_list)
+    public static List<int>? TimeString2Index(string dateString)
     {
-        if (time_list[0] == "")
+        //delete about repeat
+        if (dateString == "")
         {
             return null;
         }
         List<int> index_list = new();
-        string[] start_date = time_list[0].Split('-')[0].Split(' ');
-        string[] end_date = time_list[0].Split('-')[1].Split(' ');
-        string repeat_time = time_list[1];
+        string[] start_date = dateString.Split('-')[0].Split(' ');
+        string[] end_date = dateString.Split('-')[1].Split(' ');
         index_list.Add(int.Parse(start_date[0]));
         index_list.Add(int.Parse(start_date[1]));
         index_list.Add(int.Parse(start_date[2]));
@@ -51,27 +40,13 @@ public static class TimeUtils
         index_list.Add(int.Parse(end_date[1]));
         index_list.Add(int.Parse(end_date[2]));
         index_list.Add(int.Parse(end_date[3]));
-        if (repeat_time!= "")
-        {
-            index_list.Add(int.Parse(repeat_time.Split(' ')[0]));
-            index_list.Add(int.Parse(repeat_time.Split(' ')[1]));
-            index_list.Add(int.Parse(repeat_time.Split(' ')[2]));
-            index_list.Add(int.Parse(repeat_time.Split(' ')[3]));
-        }
-        else
-        {
-            index_list.Add(-1);
-            index_list.Add(-1);
-            index_list.Add(-1);
-            index_list.Add(-1);
-        }
         return index_list;
     }
-    public static List<string>? Index2DisplayText(List<int>? index_list)
+    public static string? Index2DisplayText(List<int>? index_list)
     {
+        //delete about repeat
         if (index_list == null)
             return null;
-        List<string> disp_text_list = new();
         Dictionary<string, string> StartDateDisplayText = new()
         {
             {"year", (index_list[0] + 1).ToString()},
@@ -86,29 +61,25 @@ public static class TimeUtils
             {"day", (index_list[6] + 1).ToString()},
             {"hour", TimeList.Hours[index_list[7]]}
         };
-        disp_text_list.Add(Translations.GetStr("ChooseDate.DisplayDate", StartDateDisplayText) + "-" + Translations.GetStr("ChooseDate.DisplayDate", EndDateDisplayText));
+        return Translations.GetStr("ChooseDate.DisplayDate", StartDateDisplayText) + "-" + Translations.GetStr("ChooseDate.DisplayDate", EndDateDisplayText);
         //disp_text_list.Add(Translations.GetStr("ChooseDate.DisplayDate", EndDateDisplayText));
-        if (index_list[8] != -1)
-        {
-            Dictionary<string, string> RepeatDisplayText = new()
-            {
-                {"year", (index_list[4] + 1).ToString()},
-                {"season", TimeList.SeasonsLong[index_list[5]]},
-                {"week", (index_list[6] + 1).ToString()},
-                {"day", (index_list[6] + 1).ToString()}
-            };
-            disp_text_list.Add(Translations.GetStr("ChooseDate.DisplayRepeat", RepeatDisplayText));
-        }
-        return disp_text_list;
     }
-    public static List<string>? TimeString2DisplayText(List<string> time_string_list)
+    public static string? TimeString2DisplayText(string timeString)
     {
-        List<string>? display_text = Index2DisplayText(TimeString2Index(time_string_list));
+        string? display_text = Index2DisplayText(TimeString2Index(timeString));
         return display_text;
+    }
+    public static void DecodeRepeatButton(SelectButton selectButton, int state)
+    {
+        selectButton.SetSelectedOptionIndex(state);
+    }
+    public static int EncodeRepeatButton(SelectButton selectButton)
+    {
+        return selectButton.GetSelectedOptionIndex();
     }
     //option index starts from -1, special value from 0 to 8
     //0: (null, null), 1: (sunny, null), 2: (rainy, null), 3: (null, lucky), 4: (sunny, lucky), 5: (rainy, lucky), 6: (null, unlucky), 7: (sunny, unlucky), 8: (rainy, unlucky) 
-    public static int EncodeSpecialTimeButton(List<SelectButton> select_buttons, int state_counts)
+    public static int EncodeSpecialDateButton(List<SelectButton> select_buttons, int state_counts)
     {
         int state = 0;
         for (int i = 0; i < select_buttons.Count; i++)
@@ -117,7 +88,7 @@ public static class TimeUtils
         }
         return state;
     }
-    public static List<int> DecodeSpecialTimeButton(int state, List<SelectButton> select_buttons, int state_counts)
+    public static List<int> DecodeSpecialDateButton(int state, List<SelectButton> select_buttons, int state_counts)
     {
         List<int> index_list = new();
         for (int i = 0; i < select_buttons.Count; i++)
@@ -128,7 +99,7 @@ public static class TimeUtils
         }
         return index_list;
     }
-    public static int[] DecodeSpecialTime(int state, int button_count = 2, int state_count = 3)
+    public static int[] DecodeSpecialDate(int state, int button_count = 2, int state_count = 3)
     {
         int[] index_list = new int[button_count];
         for (int i = 0; i < button_count; i++)
@@ -145,7 +116,7 @@ public static class TimeUtils
         List<string> seasonString = new() { "spring", "summer", "fall", "winter" };                                                                                                                                                                                      
         time = new int[2] { 0, 0 };
 
-        idx = TimeString2Index(new List<string> { dateString, "" });
+        idx = TimeString2Index(dateString);
         if (idx == null)
         {
             return null; 
@@ -155,28 +126,6 @@ public static class TimeUtils
         time[1] = 600 + 100 * idx[7]; 
         res.Add(new SDate(idx[6] + 1, seasonString[idx[5]], idx[4] + 1));
         return res;
-    }
-    public static string[] RepeatParse(string repeatString, out bool[] repeat)
-    {
-        string[] repeatIndex = repeatString.Split(' ');
-        repeat = new bool[4] { false, false, false, false };
-        if (repeatIndex[0] == "100")
-        {
-            repeat[0] = true;
-        }
-        if (repeatIndex[1] == "4")
-        {
-            repeat[1] = true;
-        }
-        if (repeatIndex[2] == "4")
-        {
-            repeat[2] = true;
-        }
-        if (repeatIndex[3] == "7")
-        {
-            repeat[3] = true;
-        }
-        return repeatIndex;
     }
     public static int[] SDate2Index4Repeat(SDate date)
     {

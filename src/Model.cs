@@ -57,7 +57,7 @@ public sealed class Plan
     public string action = "";
     public string time = "";
     public int special = 0;
-    public string repeat = "";
+    public int repeat = -1;
     public string item = "";
 }
 public class HoverFlags
