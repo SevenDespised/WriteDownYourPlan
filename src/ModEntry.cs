@@ -30,7 +30,7 @@ public class ModEntry: Mod
         helper.Events.Multiplayer.PeerConnected += OnPeerConnected;
         helper.Events.Multiplayer.ModMessageReceived += OnModMessageReceived;
         helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
-        
+        helper.Events.Display.MenuChanged += OnMenuChanged;
         helper.Events.GameLoop.Saving += OnSaving;
         helper.Events.GameLoop.Saved += OnSaved;
         helper.Events.GameLoop.TimeChanged += OnTimeChanged;
@@ -136,6 +136,15 @@ public class ModEntry: Mod
             }
         }
     }
+    private void OnMenuChanged(object? sender, MenuChangedEventArgs e)
+    {
+        // when closing wypmenu, update reminder
+        if (e.OldMenu is WypMenu)
+        {
+            reminderForHud?.UpdateReminder();
+            Monitor.Log("Reminder is updated!", LogLevel.Debug);
+        }
+    }
     private void OnTimeChanged(object? sender, TimeChangedEventArgs e)
     {
         if (reminderForHud == null || reminderForHud.RemindMessages == null || !(Config ?? new ModConfig()).DisplayHUDMessage)
@@ -163,8 +172,6 @@ public class ModEntry: Mod
         if (Game1.activeClickableMenu is WypMenu)
         {
             HideWypMenu();
-            reminderForHud?.UpdateReminder();
-            Monitor.Log("Reminder is updated!", LogLevel.Debug);
         }
         else if (Game1.activeClickableMenu == null && Context.IsPlayerFree)
             ShowWypMenu();

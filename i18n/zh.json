@@ -111,6 +111,7 @@
     "OrganizedText.One.Item": "{{item}}。",
     "OrganizedText.One.Weather": "在{{weather}}，",
     "OrganizedText.One.Luck": "在{{luck}}天，",
+    "OrganizedText.Two.WeatherLuck": "在{{weather}}且{{luck}}天，",
     "OrganizedText.Two.NPCLOC": "前往{{location}}找到{{npc}}。",
     "OrganizedText.Two.NPCACT": "找到{{npc}}，然后{{action}}。",
     "OrganizedText.Two.NPCITEM": "找到{{npc}}并带着 {{item}}。",

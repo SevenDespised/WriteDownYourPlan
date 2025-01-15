@@ -107,6 +107,7 @@ public class WypMenu : IClickableMenu
         {
             cancel_buttons.Add(new CancelButton(x_pos + ui_width - 52, y_pos + action_bar_height + bar_height * i + 30, 36, 36));
         }
+        selectRepeatButton = new SelectButton(0, 0, 0, 0, "", new List<string>());
         InitTimePageButtons();
 
         reminder = new Reminder(this.planData, this.modData);
@@ -299,6 +300,7 @@ public class WypMenu : IClickableMenu
             }
             else if (action_bar.OKBound.Contains(x, y))
             {
+                
                 exitThisMenu();
             }
             else if (action_bar.BackBound.Contains(x, y))
