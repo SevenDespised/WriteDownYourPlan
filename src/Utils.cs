@@ -143,6 +143,7 @@ public class TextUtils
 {
     public static string GetOrganizedText(Plan plan)
     {
+        string organized_text = "";
         string translation_name = "";
         string[] text_part_count_enum = {"One.", "Two.", "Three.", "Four."};
         int text_part_count = -1;
@@ -181,8 +182,22 @@ public class TextUtils
         }
         else
         {
-            return Translations.GetStr("OrganizedText." + text_part_count_enum[text_part_count] + translation_name, tokens);
+            organized_text = Translations.GetStr("OrganizedText." + text_part_count_enum[text_part_count] + translation_name, tokens);
         }
+        int[] indexList = TimeUtils.DecodeSpecialDate(plan.special);
+        if (indexList[0] + indexList[1] > 0)
+        {
+            string[] weatherName= new string[2]{"Sunny", "Rainy"};
+            string[] luckName = new string[2]{"Lucky", "Unlucky"};
+            if(indexList[0] * indexList[1] > 0)
+            {
+                var wlTokens = new { weather = Translations.GetStr("ChooseDate.Weather", weatherName[indexList[0] - 1]), luck = Translations.GetStr("ChooseDate.Luck", luckName[indexList[1] - 1]) };
+                organized_text = Translations.GetStr("OrganizedText.Two.WeatherLuck", wlTokens) + organized_text;
+            }
+        }
+
+        return organized_text;
+        
     }
     public static Dictionary<string, string> GetPlanText(Plan plan)
     {

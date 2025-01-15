@@ -70,7 +70,7 @@
     "ChooseDate.EndDate": "End Date",
     "ChooseDate.Repeat": "Repeat:",
     "ChooseDate.Weather": "Weather",
-    "ChooseDate.Weather.Sunny": "Sunny",
+    "ChooseDate.Weather.Sunny": "Not Rainy",
     "ChooseDate.Weather.Rainy": "Rainy",
     "ChooseDate.Weather.None": "None",
     "ChooseDate.Luck" : "Luck",

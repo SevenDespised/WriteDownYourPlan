@@ -34,6 +34,8 @@ public class Reminder
     const string reminderContainFestivalKey = "ContainFestival";
     const string reminderContainPassiveFestivalKey = "ContainPassiveFestival";
 
+    private bool IsFestivalDetected = false;
+
     public Reminder(PlanData planData, ModData modData)
     {
         this.planData = planData;
@@ -50,15 +52,21 @@ public class Reminder
     }
     public void InitReminder()
     {
+        InitAllFlags();
         remindMessages = GetAllRemindMessages();
     }
     internal void UpdateReminder()
     {
+        InitAllFlags();
         remindMessages = GetAllRemindMessages();
     }
     public void DeleteReminder()
     {
         remindMessages = null;
+    }
+    private void InitAllFlags()
+    {
+        IsFestivalDetected = false;
     }
     private List<List<RemindMessage>>? GetAllRemindMessages()
     {
@@ -106,7 +114,7 @@ public class Reminder
             //res.Add(new RemindMessage());
             return res;
         }
-        if(dates[0] < SDate.Now())
+        if(dates[0] < SDate.Now())                                                                      
         {
             nowToEndDates = new List<SDate> { SDate.Now(), dates[1] };
         }
@@ -149,7 +157,7 @@ public class Reminder
             List<SDate> datesForCheck = nowToEndDates?? dates;
             if (IsContainedByPlan(startDate, datesForCheck) || IsContainedByPlan(startDate, datesForCheck.Select(d => new SDate(d.Day, d.Season, d.Year + 1)).ToList()))
             {
-                res.Add(new RemindMessage(reminderContainPassiveFestivalKey, new { festival = passiveFestival.Key, date = startDate.ToLocaleString(withYear: false), enddate = endDate.ToLocaleString(withYear: false) }, 0));
+                res.Add(new RemindMessage(reminderContainPassiveFestivalKey, new { festival = passiveFestival.Value.DisplayName, date = startDate.ToLocaleString(withYear: false), enddate = endDate.ToLocaleString(withYear: false) }, 0));
                 break;
             }
         }
@@ -204,7 +212,19 @@ public class Reminder
         //festival
         if (Utility.isFestivalDay() || Utility.IsPassiveFestivalDay())
         {
-            res.Add(new RemindMessage(reminderFestivalKey, null, 630));
+            if (IsFestivalDetected)
+            {   
+                res.Add(new RemindMessage(reminderFestivalKey, null, 0));
+            }
+            else
+            {
+                IsFestivalDetected = true;
+                res.Add(new RemindMessage(reminderFestivalKey, null, 630));
+            }
+        }
+        else
+        {
+            IsFestivalDetected = false;
         }
 
         //birthday

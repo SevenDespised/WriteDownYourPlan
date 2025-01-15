@@ -33,13 +33,18 @@ public class ModEntry: Mod
         helper.Events.Display.MenuChanged += OnMenuChanged;
         helper.Events.GameLoop.Saving += OnSaving;
         helper.Events.GameLoop.Saved += OnSaved;
+        helper.Events.GameLoop.DayStarted += OnDayStarted;
         helper.Events.GameLoop.TimeChanged += OnTimeChanged;
         //todo:hudmessage
         //Constants.SaveFolderName;
         //以下用于存储数据和调试
     }
 
-
+    private void OnDayStarted(object? sender, DayStartedEventArgs e)
+    { 
+        reminderForHud?.UpdateReminder();
+        Monitor.Log("Reminder is updated!(DayStart)", LogLevel.Debug);
+    }
 
     private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
     {
@@ -51,7 +56,6 @@ public class ModEntry: Mod
             planData = Helper.Data.ReadSaveData<PlanData>("plandata") ?? new PlanData();
             Monitor.Log("Model is loaded!", LogLevel.Debug);
             reminderForHud = new Reminder(planData, modData);
-            reminderForHud.InitReminder();
             Monitor.Log("Reminder is initialized!(host)", LogLevel.Debug);
         }
         TimeList.Init();
@@ -130,7 +134,6 @@ public class ModEntry: Mod
                 if (modData != null)
                 {
                     reminderForHud = new Reminder(planData, modData);
-                    reminderForHud.InitReminder();
                     Monitor.Log("Reminder is initialized!(client)", LogLevel.Debug);
                 }
             }
@@ -142,7 +145,7 @@ public class ModEntry: Mod
         if (e.OldMenu is WypMenu)
         {
             reminderForHud?.UpdateReminder();
-            Monitor.Log("Reminder is updated!", LogLevel.Debug);
+            Monitor.Log("Reminder is updated!(menuclosed)", LogLevel.Debug);
         }
     }
     private void OnTimeChanged(object? sender, TimeChangedEventArgs e)

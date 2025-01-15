@@ -141,7 +141,7 @@ public class WypMenu : IClickableMenu
             if (planPageIndex > 0)
                 leftright_button.DrawLeftButton(b);
             if (planPageIndex < planData.plan.Count / 5 && planPageIndex != (config.MaxPlan - 1) / 5)
-                leftright_button.DrawRightButton(b);                     
+                leftright_button.DrawRightButton(b);                
             
             for (int i = 0; i < 5; i++)
             {
