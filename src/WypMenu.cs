@@ -202,29 +202,34 @@ public class WypMenu : IClickableMenu
                 int width = ui_width + Game1.tileSize;
                 int height = ui_height + Game1.tileSize / 2;
                 SpriteFont font = Game1.smallFont;
-                int gap = Game1.tileSize * 3 / 4;
+                int gap = Game1.tileSize * 7 / 8;
                 int[] widths = {32, 64, 32, 96};
                 Game1.DrawBox(x, y, width, height);
                 SpriteText.drawStringWithScrollCenteredAt(b, Translations.GetStr("ChoosePage", "Title"), base.xPositionOnScreen + base.width / 2, base.yPositionOnScreen - 64);
                 action_bar.Draw(b, pageIndex);
-                b.DrawString(font, Translations.GetStr("ChooseDate.StartDate"), new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year")).X) * 3 / 4, y + action_bar_height), Color.Black);
-                b.DrawString(font, Translations.GetStr("ChooseDate.EndDate"), new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year")).X) * 3 / 4, y + action_bar_height + Game1.tileSize * 2), Color.Black);
-                //b.DrawString(font, Translations.GetStr("ChooseDate.Repeat"), new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year")).X) * 3 / 4, y + action_bar_height + Game1.tileSize * 4), Color.Black);
+                b.DrawString(font, Translations.GetStr("ChooseDate.StartDate"), new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year")).X) / 2, y + action_bar_height), Color.Black);
+                b.DrawString(font, Translations.GetStr("ChooseDate.EndDate"), new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year")).X) / 2, y + action_bar_height + Game1.tileSize * 5 / 2), Color.Black);
                 
-                y += action_bar_height + Game1.tileSize;
+                //transform season-day to week-day
+                string week = Translations.GetStr("ChooseDate.WhichWeek", new{ week = (arrowDateButtons[2].Index / 7 + 1).ToString() });
+                string day = TimeList.Days[arrowDateButtons[2].Index % 7];
+                b.DrawString(font, week + " " + day, new Vector2(x + width / 2, y + action_bar_height), Color.Black);
+                week = Translations.GetStr("ChooseDate.WhichWeek", new { week = (arrowDateButtons[6].Index / 7 + 1).ToString() });
+                day = TimeList.Days[arrowDateButtons[6].Index % 7];
+                b.DrawString(font, week + " " + day, new Vector2(x + width / 2, y + action_bar_height + Game1.tileSize * 5 / 2), Color.Black);
+                
+                //draw time selection text
+                y += action_bar_height + Game1.tileSize / 2;
                 b.DrawString(font, Translations.GetStr("ChooseDate.Year") + ":", new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year") + ":").X) * 3 / 4, y), Color.Black);
                 b.DrawString(font, Translations.GetStr("ChooseDate.Season") + ":", new Vector2(x + widths[0] + gap + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Season") + ":").X) * 3 / 4, y), Color.Black);
                 b.DrawString(font, Translations.GetStr("ChooseDate.Day") + ":", new Vector2(x + widths[0] + widths[1] + gap * 2 + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Day") + ":").X) * 3 / 4, y), Color.Black);
                 b.DrawString(font, Translations.GetStr("ChooseDate.Hour") + ":", new Vector2(x + widths[0] + widths[1] + widths[2] + gap * 3 + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Hour") + ":").X) * 3 / 4, y), Color.Black);
-                y += Game1.tileSize * 2;
+                y += Game1.tileSize * 5 / 2;
                 b.DrawString(font, Translations.GetStr("ChooseDate.Year") + ":", new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year") + ":").X) * 3 / 4, y), Color.Black);
                 b.DrawString(font, Translations.GetStr("ChooseDate.Season") + ":", new Vector2(x + widths[0] + gap + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Season") + ":").X) * 3 / 4, y), Color.Black);
                 b.DrawString(font, Translations.GetStr("ChooseDate.Day") + ":", new Vector2(x + widths[0] + widths[1] + gap * 2 + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Day") + ":").X) * 3 / 4, y), Color.Black);
                 b.DrawString(font, Translations.GetStr("ChooseDate.Hour") + ":", new Vector2(x + widths[0] + widths[1] + widths[2] + gap * 3 + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Hour") + ":").X) * 3 / 4, y), Color.Black);
-                y += Game1.tileSize * 2;
                 widths[0] = 56; widths[1] = 56; widths[2] = 56; widths[3] = 56;
-                x += 16;
-                gap = Game1.tileSize;
             
                 foreach (SelectByArrowButton button in arrowDateButtons)
                 {
@@ -611,31 +616,29 @@ public class WypMenu : IClickableMenu
         }
         selectRepeatButton.ToggleOption(selectRepeatButton.GetClickedOptionIndex(x, y));
     }
-
+    //checkpoint
     private void InitTimePageButtons()
-    {   
+    {
         int x = x_pos - Game1.tileSize / 2;
         int y = y_pos + action_bar_height + Game1.tileSize;
-        int gap = Game1.tileSize * 3 / 4;
-        int[] widths = {32, 64, 32, 96};
+        int gap = Game1.tileSize * 7 / 8;
+        int[] widths = {32, 64, 32, 72};
         //start date
         arrowDateButtons.Add(new SelectByArrowButton(x + gap, y, widths[0], 32, Leftright: false));
         arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + gap * 2, y, widths[1], 32, TimeList.Seasons, Leftright: false));
         arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + gap * 3, y, widths[2], 32, MaxIndex: 27, Leftright: false));
         arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + widths[2] + gap * 4, y, widths[3], 32, TimeList.Hours, Leftright: false));
         //end date
-        y += Game1.tileSize * 2;
+        y += Game1.tileSize * 5 / 2;
         arrowDateButtons.Add(new SelectByArrowButton(x + gap, y, widths[0], 32, Leftright: false));
         arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + gap * 2, y, widths[1], 32, TimeList.Seasons, Leftright: false));
         arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + gap * 3, y, widths[2], 32, MaxIndex: 27, Leftright: false));
         arrowDateButtons.Add(new SelectByArrowButton(x + widths[0] + widths[1] + widths[2] + gap * 4, y, widths[3], 32, TimeList.Hours, Leftright: false));
-        //repeat
+        
+        //repeat and special day
         y += Game1.tileSize;
-        widths[0] = 56; widths[1] = 56; widths[2] = 56; widths[3] = 56;
         x += 16;
-
-        //delete repeat arrow button to add select button
-        selectRepeatButton = new(x, y, 32, 32, Translations.GetStr("ChooseDate.Repeat"), new List<string> { Translations.GetStr("ChooseDate.Year"), Translations.GetStr("ChooseDate.Season"), Translations.GetStr("ChooseDate.Week"), Translations.GetStr("ChooseDate.Day")});
+        selectRepeatButton = new(x, y + Game1.tileSize / 2, 32, 32, Translations.GetStr("ChooseDate.Repeat") + ":", new List<string> { Translations.GetStr("ChooseDate.Year"), Translations.GetStr("ChooseDate.Season"), Translations.GetStr("ChooseDate.Week"), Translations.GetStr("ChooseDate.Day")});
         selectSpecialDayButtons.Add(new SelectButton(x, y + Game1.tileSize + Game1.tileSize / 8, 32, 32, Translations.GetStr("ChooseDate.Weather") + ":", new List<string> { Translations.GetStr("ChooseDate.Weather.Sunny"), Translations.GetStr("ChooseDate.Weather.Rainy") }));
         selectSpecialDayButtons.Add(new SelectButton(x, y + Game1.tileSize * 3 / 2 + Game1.tileSize / 8, 32, 32, Translations.GetStr("ChooseDate.Luck") + ":", new List<string> {Translations.GetStr("ChooseDate.Luck.Lucky"), Translations.GetStr("ChooseDate.Luck.Unlucky")}));
     }

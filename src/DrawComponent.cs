@@ -202,6 +202,7 @@ public class SelectByArrowButton
     private bool is_repeat = false;
     public List<Rectangle> PageButtonBound{ get;set; }
     public Rectangle TextBound{ get;set; } 
+    public int Index{ get{ return index; } }
     public SelectByArrowButton(int X, int Y, int W, int H, List<string> Content, bool Leftright = false)
     {
         x = X;
