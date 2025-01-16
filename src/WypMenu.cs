@@ -41,7 +41,7 @@ public class WypMenu : IClickableMenu
     SelectButton selectRepeatButton;
     readonly List<SelectButton> selectSpecialDayButtons = new();
     readonly List<SelectByArrowButton> arrowDateButtons = new();
-    readonly HoverFlags hover_flags = new();
+    readonly HoverFlags hoverFlags = new();
     readonly List<string> time_labels = new()
     {
         Translations.GetStr("ChooseDate.Year"),
@@ -501,18 +501,18 @@ public class WypMenu : IClickableMenu
     public override void performHoverAction(int x, int y)
     {
         //base.performHoverAction(x, y);
-        hover_flags.SetDefaultFlags();
+        hoverFlags.SetDefaultFlags();
         if (pageIndex == (int)PageEnum.mainPage)
         {
             if (menu_bound.Contains(x, y))
             {
-                hover_flags.MainPage_HoverPlan = true;
+                hoverFlags.MainPage_HoverPlan = true;
                 planIndexOnPage = (y - y_pos - action_bar_height) / bar_height;
                 hover_plan = planPageIndex * 5 + planIndexOnPage < planData.plan.Count ? planData.plan[planPageIndex * 5 + planIndexOnPage] : new();
             }
             else
             {
-                hover_flags.MainPage_HoverPlan = false;
+                hoverFlags.MainPage_HoverPlan = false;
                 hover_plan = new();
             }
         }
@@ -520,8 +520,15 @@ public class WypMenu : IClickableMenu
         {
             if (choose_buttons[3].TextBound.Contains(x, y))
             {
-                hover_flags.TimePage_HoverTime = true;
-                //drawToolTip(b, Translations.GetStr("EditPage.Time.Description"), "", null);
+                hoverFlags.TimePage_HoverTime = true;
+            }
+            if (action_bar.OKBound.Contains(x, y))
+            {
+                hoverFlags.EditPage_HoverOK = true;
+            }
+            else if (action_bar.BackBound.Contains(x, y))
+            {
+                hoverFlags.EditPage_HoverBack = true;
             }
         }
         else if (pageIndex == (int)PageEnum.choosePage)
@@ -548,7 +555,7 @@ public class WypMenu : IClickableMenu
     {
         if (pageIndex == (int)PageEnum.mainPage)
         {
-            if (hover_flags.MainPage_HoverPlan)
+            if (hoverFlags.MainPage_HoverPlan)
             {
                 string? tmp = TimeString2DisplayText(hover_plan.time);
                 string organized_text = TextUtils.GetOrganizedText(hover_plan); 
@@ -564,13 +571,21 @@ public class WypMenu : IClickableMenu
         }
         else if (pageIndex == (int)PageEnum.editPage)
         {
-            if (hover_flags.TimePage_HoverTime)
+            if (hoverFlags.TimePage_HoverTime)
             {
                 string? tmp = TimeString2DisplayText(new_plan.time);
                 if (tmp is not null)
                 {
                     drawToolTip(b, tmp, "", null);
                 }
+            }
+            if (hoverFlags.EditPage_HoverOK)
+            {
+                drawToolTip(b, Translations.GetStr("EditPage.OK"), "", null);
+            }
+            if (hoverFlags.EditPage_HoverBack)
+            {
+                drawToolTip(b, Translations.GetStr("EditPage.Back"), "", null);
             }
         }
         else if (pageIndex == (int)PageEnum.choosePage)
@@ -595,18 +610,44 @@ public class WypMenu : IClickableMenu
     }
     private void DateButtonCheck(int x, int y)
     {
-        for (int i = 0; i < arrowDateButtons.Count; i++)
+        int interval = arrowDateButtons.Count / 2;
+        List<SDate>? dateList = DateParse(Index2TimeString(arrowDateButtons), out int[] time);
+        for (int i = 0; i < interval; i++)
         {
             SelectByArrowButton button = arrowDateButtons[i];
             if (button.PageButtonBound[0].Contains(x, y))
             {
                 button.DecreasePage();
-                //CheckEnableRepeat();
+            }
+            else if (button.PageButtonBound[1].Contains(x, y))
+            {
+                if (dateList is not null && i != interval - 1)
+                {
+                    if (dateList[0] >= dateList[1])
+                    {
+                        arrowDateButtons[i + interval].IncreasePage();
+                    }
+                }
+                button.IncreasePage();
+            }
+        }
+        for (int i = interval; i < arrowDateButtons.Count; i++)
+        {
+            SelectByArrowButton button = arrowDateButtons[i];
+            if (button.PageButtonBound[0].Contains(x, y))
+            {
+                if (dateList is not null && i != interval - 1)
+                {
+                    if (dateList[0] >= dateList[1])
+                    {
+                        arrowDateButtons[i - interval].DecreasePage();
+                    }
+                }
+                button.DecreasePage();
             }
             else if (button.PageButtonBound[1].Contains(x, y))
             {
                 button.IncreasePage();
-                //CheckEnableRepeat();
             }
         }
         for (int i = 0; i < selectSpecialDayButtons.Count; i++)

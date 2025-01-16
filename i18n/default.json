@@ -1,7 +1,8 @@
 {
     "MainPage.Title": "Writedown Your Plan!",
-    "MainPage.Return": "Return to the game",
     "MainPage.Delete": "Delete this plan",
+    "EditPage.OK": "Save and back",
+    "EditPage.Back": "Not save and back",
     "EditPage.Title": "Edit Your Plan",
     "EditPage.EditTitle": "Edit plan title here.",
     "EditPage.NPC": "NPC",

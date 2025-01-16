@@ -150,13 +150,13 @@ public class ModEntry: Mod
     }
     private void OnTimeChanged(object? sender, TimeChangedEventArgs e)
     {
-        if (reminderForHud == null || reminderForHud.RemindMessages == null || !(Config ?? new ModConfig()).DisplayHUDMessage)
+        if (reminderForHud == null || reminderForHud.AllRemindMessages == null || !(Config ?? new ModConfig()).DisplayHUDMessage)
         {
             return;
         }
-        for (int i = 0; i < reminderForHud.RemindMessages.Count; i++)
+        for (int i = 0; i < reminderForHud.AllRemindMessages.Count; i++)
         {
-            var remindeMessage = reminderForHud.RemindMessages[i];
+            var remindeMessage = reminderForHud.AllRemindMessages[i];
             foreach (var message in remindeMessage)
             {
                 if (message.RemindTime != 0)

@@ -9,13 +9,13 @@ public class Reminder
 {
     readonly PlanData planData;
     readonly ModData modData;
-    private List<List<RemindMessage>>? remindMessages = null;
+    private List<List<RemindMessage>>? allRemindMessages = null;
     //generate attribute of remind message
-    public List<List<RemindMessage>>? RemindMessages
+    public List<List<RemindMessage>>? AllRemindMessages
     {
         get
         {
-            return remindMessages;
+            return allRemindMessages;
         }
     }
     const string reminderStartKey = "Start";
@@ -33,36 +33,33 @@ public class Reminder
     const string reminderContainBirthdayKey = "ContainBirthday";
     const string reminderContainFestivalKey = "ContainFestival";
     const string reminderContainPassiveFestivalKey = "ContainPassiveFestival";
-
     private bool IsFestivalDetected = false;
-
     public Reminder(PlanData planData, ModData modData)
     {
         this.planData = planData;
         this.modData = modData;
     }
-    
     public void Draw(SpriteBatch b, int x, int y, int width, int height, int planIndex)
     {
-        if (remindMessages == null || planIndex >= remindMessages.Count ||remindMessages[planIndex].Count == 0)
+        if (allRemindMessages == null || planIndex >= allRemindMessages.Count ||allRemindMessages[planIndex].Count == 0)
         {
             return;
         }
-        DrawReminder.Draw(b, x, y, width, height, remindMessages[planIndex]);
+        DrawReminder.Draw(b, x, y, width, height, allRemindMessages[planIndex]);
     }
     public void InitReminder()
     {
         InitAllFlags();
-        remindMessages = GetAllRemindMessages();
+        allRemindMessages = GetAllRemindMessages();
     }
     internal void UpdateReminder()
     {
         InitAllFlags();
-        remindMessages = GetAllRemindMessages();
+        allRemindMessages = GetAllRemindMessages();
     }
     public void DeleteReminder()
     {
-        remindMessages = null;
+        allRemindMessages = null;
     }
     private void InitAllFlags()
     {
@@ -269,7 +266,7 @@ public class Reminder
         List<RemindMessage> res = new();
         string weatherToday = Game1.netWorldState.Value.GetWeatherForLocation("Default").Weather;
         double luck = Game1.player.DailyLuck;
-
+        int remindTime = IsExist(new string[2]{ reminderStartKey, reminderRepeatStartKey }, DetectDate(plan)) ? 630 : 0; 
         //weather and luck
         int[] stateIndex = TimeUtils.DecodeSpecialDate(plan.special);
         switch (weatherToday)
@@ -277,13 +274,13 @@ public class Reminder
             case Game1.weather_rain:
                 if (stateIndex[0] == 2)
                 {
-                    res.Add(new RemindMessage(reminderRainKey, null, 630));
+                    res.Add(new RemindMessage(reminderRainKey, null, remindTime));
                 }
                 break;
             default:
                 if (stateIndex[0] == 1)
                 {
-                    res.Add(new RemindMessage(reminderNorainKey, null, 630));
+                    res.Add(new RemindMessage(reminderNorainKey, null, remindTime));
                 }
                 break;
         }
@@ -291,19 +288,55 @@ public class Reminder
         {
             if (stateIndex[1] == 1)
             {
-                res.Add(new RemindMessage(reminderLuckyKey, null, 630));
+                res.Add(new RemindMessage(reminderLuckyKey, null, remindTime));
             }
         }
         else
         {
             if (stateIndex[1] == 2)
             {
-                res.Add(new RemindMessage(reminderUnluckyKey, null, 630));
+                res.Add(new RemindMessage(reminderUnluckyKey, null, remindTime));
             }
         }
         return res;
     }
-
+    public static bool IsExist(string reminderKey, List<RemindMessage> remindMessages)
+    {
+        foreach (var message in remindMessages)
+        {
+            if (message.DisplayKey == reminderKey)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    public static bool IsExist(string[] reminderKeys, List<RemindMessage> remindMessages)
+    {
+        foreach (var message in remindMessages)
+        {
+            foreach (var reminderKey in reminderKeys)
+            {
+                if (message.DisplayKey == reminderKey)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    public static List<int> GetIndexFromExistedKey(string reminderKey, List<List<RemindMessage>> allRemindMessages)
+    {
+        List<int> res = new();
+        for (int i = 0; i < allRemindMessages.Count; i++)
+        {
+            if (allRemindMessages[i].Exists(m => m.DisplayKey == reminderKey))
+            {
+                res.Add(i);
+            }
+        }
+        return res;
+    }
 }
 
 public sealed class RemindMessage

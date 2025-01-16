@@ -1,7 +1,8 @@
 {
     "MainPage.Title": "写下你的计划！",
-    "MainPage.Return": "返回游戏",
     "MainPage.Delete": "删除此计划",
+    "EditPage.OK": "存储并返回",
+    "EditPage.Back": "不存储并返回",
     "EditPage.Title": "编辑你的计划",
     "EditPage.EditTitle": "在此处编辑计划标题",
     "EditPage.NPC": "NPC",

@@ -7,8 +7,8 @@ using StardewValley.GameData;
 namespace WritedownYourPlan.src;
 public sealed class ModConfig
 {
-    public KeybindList DisplayWYPButton { get; set; } = new(SButton.F2);
-    public KeybindList SaveModelButton { get; set; } = KeybindList.Parse($"{SButton.LeftShift} + {SButton.F2}");
+    public KeybindList DisplayWYPButton { get; set; } = new(SButton.F3);
+    public KeybindList SaveModelButton { get; set; } = KeybindList.Parse($"{SButton.LeftShift} + {SButton.F3}");
     public int MaxPlan { get; set; } = 20;
     public bool ReadDatatFromJson { get; set; } = false;
     public bool DisplayHUDMessage { get; set; } = true;
@@ -64,12 +64,18 @@ public class HoverFlags
 {
     private bool mainPage_HoverPlan = false;
     private bool timePage_HoverTime = false;
+    private bool editPage_HoverBack = false;
+    private bool editPage_HoverOK = false;
     public bool MainPage_HoverPlan { get => mainPage_HoverPlan; set => mainPage_HoverPlan = value; }
     public bool TimePage_HoverTime { get => timePage_HoverTime; set => timePage_HoverTime = value; }
+    public bool EditPage_HoverBack { get => editPage_HoverBack; set => editPage_HoverBack = value; }
+    public bool EditPage_HoverOK { get => editPage_HoverOK; set => editPage_HoverOK = value; }
     public void SetDefaultFlags()
     {
         MainPage_HoverPlan = false;
         TimePage_HoverTime = false;
+        EditPage_HoverBack = false;
+        EditPage_HoverOK = false;
     }
 }
 public sealed class Time
