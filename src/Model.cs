@@ -93,8 +93,8 @@ public sealed class PlanData
 
 public sealed class ModData
 {
-    public List<string> location_data = new();
-    public Dictionary<string, List<List<string>>> npc_data = new();
+    public List<string> locationData = new();
+    public Dictionary<string, List<List<string>>> npcData = new();
 }
 
 public sealed class LoadData

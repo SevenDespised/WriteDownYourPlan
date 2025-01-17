@@ -251,11 +251,11 @@ public class Reminder
         List<RemindMessage> res = new();
         if (plan.npc != "")
         {
-            if (plan.action != "" && !modData.npc_data[plan.npc][1].Contains(plan.action))
+            if (plan.action != "" && !modData.npcData[plan.npc][1].Contains(plan.action))
             {
                 res.Add(new RemindMessage(reminderActUnmatchKey, new { npc = NPC.GetDisplayName(plan.npc), action = Translations.GetStr("ChooseAction", plan.action) }, 0));
             }
-            if (plan.location != "" && !modData.npc_data[plan.npc][0].Contains(plan.location))
+            if (plan.location != "" && !modData.npcData[plan.npc][0].Contains(plan.location))
             {
                 res.Add(new RemindMessage(reminderLocUnmatchKey, new { npc =  NPC.GetDisplayName(plan.npc), location = Translations.GetStr("ChooseLocation", plan.location) }, 0));
             }

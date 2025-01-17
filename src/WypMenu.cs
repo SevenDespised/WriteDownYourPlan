@@ -20,24 +20,24 @@ public class WypMenu : IClickableMenu
     public ModConfig config;
     private readonly Reminder reminder;
     public readonly LoadData loaddata = new();
-    public readonly int x_pos = (int)(Game1.viewport.Width * Game1.options.zoomLevel * (1 / Game1.options.uiScale)) / 2 - Game1.tileSize * 6 / 2;
-    public readonly int y_pos = (int)(Game1.viewport.Height * Game1.options.zoomLevel * (1 / Game1.options.uiScale)) / 2 - Game1.tileSize * 6 / 2 - Game1.tileSize;
-    public readonly int ui_width = Game1.tileSize * 6;
-    public readonly int ui_height = Game1.tileSize / 2 + Game1.tileSize * 8;
-    public readonly int action_bar_height = Game1.tileSize;
-    public readonly int bar_height = Game1.tileSize + Game1.tileSize / 2;
-    public Plan new_plan = new();
-    Plan hover_plan = new();
-    Rectangle menu_bound;
-    List<Rectangle> choose_bound_list = new();
-    Dictionary<string, Rectangle> choose_bound_dict = new();
+    public readonly int xPos = (int)(Game1.viewport.Width * Game1.options.zoomLevel * (1 / Game1.options.uiScale)) / 2 - Game1.tileSize * 6 / 2;
+    public readonly int yPos = (int)(Game1.viewport.Height * Game1.options.zoomLevel * (1 / Game1.options.uiScale)) / 2 - Game1.tileSize * 6 / 2 - Game1.tileSize;
+    public readonly int uiWidth = Game1.tileSize * 6;
+    public readonly int uiHeight = Game1.tileSize / 2 + Game1.tileSize * 8;
+    public readonly int actionBarHeight = Game1.tileSize;
+    public readonly int barHeight = Game1.tileSize + Game1.tileSize / 2;
+    public Plan newPlan = new();
+    Plan hoverPlan = new();
+    Rectangle menuBound;
+    List<Rectangle> chooseBoundList = new();
+    Dictionary<string, Rectangle> chooseBoundDict = new();
     readonly SearchBox titleBox;
-    readonly SearchBox item_box;
-    readonly ActionBar action_bar;
-    PageButton updown_button;
-    readonly PageButton leftright_button;
-    readonly List<CancelButton> cancel_buttons;
-    readonly List<ChooseButton> choose_buttons;
+    readonly SearchBox itemBox;
+    readonly ActionBar actionBar;
+    PageButton updownButton;
+    readonly PageButton leftrightButton;
+    readonly List<CancelButton> cancelButtons;
+    readonly List<ChooseButton> chooseButtons;
     SelectButton selectRepeatButton;
     readonly List<SelectButton> selectSpecialDayButtons = new();
     readonly List<SelectByArrowButton> arrowDateButtons = new();
@@ -50,9 +50,8 @@ public class WypMenu : IClickableMenu
     int planIndexOnPage;
     // choosePageIndex: 0-npc, 1-location, 2-action, 3-time, 4-item
     int choosePageIndex;
-    private List<string> pririoty_location = new();
-    int location_display_index = 0;
-    //bool is_canceling = false;
+    List<string> pririotyLocation = new();
+    int locationDisplayIndex = 0;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="WypMenu"/> class with specified model and mod data.
@@ -70,28 +69,28 @@ public class WypMenu : IClickableMenu
     /// </remarks>
     public WypMenu(PlanData planData, ModData modData, ModConfig config)
     {
-        initialize(x_pos, y_pos, ui_width, ui_height);
+        initialize(xPos, yPos, uiWidth, uiHeight);
         this.planData = planData;
         this.modData = modData;
         this.config = config;
-        menu_bound = new Rectangle(x_pos, y_pos + action_bar_height, ui_width, ui_height - action_bar_height);
+        menuBound = new Rectangle(xPos, yPos + actionBarHeight, uiWidth, uiHeight - actionBarHeight);
         titleBox = new SearchBox(null, null, Game1.smallFont, Color.Black, Translations.GetStr("EditPage.EditTitle"));
-        item_box = new SearchBox(null, null, Game1.smallFont, Color.Black, Translations.GetStr("ChooseItem.EditItem"));
-        action_bar = new ActionBar(x_pos, y_pos, ui_width, action_bar_height);
-        leftright_button = new PageButton(x_pos - 32, y_pos, ui_width, ui_height, ui_width + Game1.tileSize);
-        updown_button = new PageButton(x_pos, y_pos, ui_width, ui_height, ui_width + Game1.tileSize);
-        cancel_buttons = new List<CancelButton>();
-        choose_buttons = new List<ChooseButton>
+        itemBox = new SearchBox(null, null, Game1.smallFont, Color.Black, Translations.GetStr("ChooseItem.EditItem"));
+        actionBar = new ActionBar(xPos, yPos, uiWidth, actionBarHeight);
+        leftrightButton = new PageButton(xPos - 32, yPos, uiWidth, uiHeight, uiWidth + Game1.tileSize);
+        updownButton = new PageButton(xPos, yPos, uiWidth, uiHeight, uiWidth + Game1.tileSize);
+        cancelButtons = new List<CancelButton>();
+        chooseButtons = new List<ChooseButton>
         {
-            new(x_pos, y_pos + action_bar_height + 30 + Game1.tileSize * 1, ui_width, Game1.tileSize),
-            new(x_pos, y_pos + action_bar_height + 30 + Game1.tileSize * 2, ui_width, Game1.tileSize),
-            new(x_pos, y_pos + action_bar_height + 30 + Game1.tileSize * 3, ui_width, Game1.tileSize),
-            new(x_pos, y_pos + action_bar_height + 30 + Game1.tileSize * 4, ui_width, Game1.tileSize),
-            new(x_pos, y_pos + action_bar_height + 30 + Game1.tileSize * 5, ui_width, Game1.tileSize)
+            new(xPos, yPos + actionBarHeight + 30 + Game1.tileSize * 1, uiWidth, Game1.tileSize),
+            new(xPos, yPos + actionBarHeight + 30 + Game1.tileSize * 2, uiWidth, Game1.tileSize),
+            new(xPos, yPos + actionBarHeight + 30 + Game1.tileSize * 3, uiWidth, Game1.tileSize),
+            new(xPos, yPos + actionBarHeight + 30 + Game1.tileSize * 4, uiWidth, Game1.tileSize),
+            new(xPos, yPos + actionBarHeight + 30 + Game1.tileSize * 5, uiWidth, Game1.tileSize)
         };
         for (int i = 0; i < 5; i++)
         {
-            cancel_buttons.Add(new CancelButton(x_pos + ui_width - 52, y_pos + action_bar_height + bar_height * i + 30, 36, 36));
+            cancelButtons.Add(new CancelButton(xPos + uiWidth - 52, yPos + actionBarHeight + barHeight * i + 30, 36, 36));
         }
         selectRepeatButton = new SelectButton(0, 0, 0, 0, "", new List<string>());
         InitTimePageButtons();
@@ -121,91 +120,91 @@ public class WypMenu : IClickableMenu
         //draw page button
         if (pageIndex == (int)PageEnum.mainPage)
         {
-            Game1.DrawBox(x_pos, y_pos, ui_width, ui_height);
+            Game1.DrawBox(xPos, yPos, uiWidth, uiHeight);
             SpriteText.drawStringWithScrollCenteredAt(b, Translations.GetStr("MainPage", "Title"), xPositionOnScreen + base.width / 2, base.yPositionOnScreen - 64);
-            action_bar.Draw(b, pageIndex);
+            actionBar.Draw(b, pageIndex);
             if (planPageIndex > 0)
-                leftright_button.DrawLeftButton(b);
+                leftrightButton.DrawLeftButton(b);
             if (planPageIndex < planData.plan.Count / 5 && planPageIndex != (config.MaxPlan - 1) / 5)
-                leftright_button.DrawRightButton(b);                
+                leftrightButton.DrawRightButton(b);                
             
             for (int i = 0; i < 5; i++)
             {
-                drawTextureBox(b, Game1.mouseCursors, new Rectangle(384, 396, 15, 15), x_pos, y_pos + action_bar_height + bar_height * i, ui_width, bar_height, Color.White, 4f, false);
-                cancel_buttons[i].Draw(b);
+                drawTextureBox(b, Game1.mouseCursors, new Rectangle(384, 396, 15, 15), xPos, yPos + actionBarHeight + barHeight * i, uiWidth, barHeight, Color.White, 4f, false);
+                cancelButtons[i].Draw(b);
                 if (planPageIndex * 5 + i < planData.plan.Count)
                 {
-                    DrawLimitWidthString.Draw(b, planData.plan[planPageIndex * 5 + i].title, Game1.smallFont, x_pos + 24, y_pos + action_bar_height + bar_height * i + 16, ui_width - 90, Color.Black);
-                    DrawLimitWidthString.Draw(b, TextUtils.GetOrganizedText(planData.plan[planPageIndex * 5 + i]), Game1.smallFont, x_pos + 24, y_pos + action_bar_height + bar_height * i + 48, ui_width - 90, Color.Black);
+                    DrawLimitWidthString.Draw(b, planData.plan[planPageIndex * 5 + i].title, Game1.smallFont, xPos + 24, yPos + actionBarHeight + barHeight * i + 16, uiWidth - 90, Color.Black);
+                    DrawLimitWidthString.Draw(b, TextUtils.GetOrganizedText(planData.plan[planPageIndex * 5 + i]), Game1.smallFont, xPos + 24, yPos + actionBarHeight + barHeight * i + 48, uiWidth - 90, Color.Black);
                 }
             }
         }
         else if (pageIndex == (int)PageEnum.editPage)
         {
-            Game1.DrawBox(x_pos, y_pos, ui_width, ui_height);
+            Game1.DrawBox(xPos, yPos, uiWidth, uiHeight);
             SpriteText.drawStringWithScrollCenteredAt(b, Translations.GetStr("EditPage", "Title"), xPositionOnScreen + base.width / 2, base.yPositionOnScreen - 64);
-            action_bar.Draw(b, pageIndex);
-            titleBox.Bounds = new Rectangle(x_pos, y_pos + action_bar_height, ui_width, Game1.tileSize);
-            if (new_plan.title != "")
+            actionBar.Draw(b, pageIndex);
+            titleBox.Bounds = new Rectangle(xPos, yPos + actionBarHeight, uiWidth, Game1.tileSize);
+            if (newPlan.title != "")
             {
-                titleBox.SetHoverText(new_plan.title);
+                titleBox.SetHoverText(newPlan.title);
             }
             titleBox.Draw(b);
-            choose_buttons[0].Draw(b,Translations.GetStr("EditPage.NPC"), Translations.GetNPCName(new_plan.npc));
-            choose_buttons[1].Draw(b, Translations.GetStr("EditPage.Location"),  Translations.GetStr("ChooseLocation", new_plan.location));
-            choose_buttons[2].Draw(b, Translations.GetStr("EditPage.Action"), Translations.GetStr("ChooseAction", new_plan.action));
-            choose_buttons[3].Draw(b, Translations.GetStr("EditPage.Time"), new_plan.time == "" ? "" : Translations.GetStr("EditPage.Time.Description"));
-            choose_buttons[4].Draw(b, Translations.GetStr("EditPage.Item"), new_plan.item); 
-            reminder.Draw(b, x_pos - ui_width - 16, y_pos, ui_width, ui_height, planPageIndex * 5 + planIndexOnPage);
+            chooseButtons[0].Draw(b,Translations.GetStr("EditPage.NPC"), Translations.GetNPCName(newPlan.npc));
+            chooseButtons[1].Draw(b, Translations.GetStr("EditPage.Location"),  Translations.GetStr("ChooseLocation", newPlan.location));
+            chooseButtons[2].Draw(b, Translations.GetStr("EditPage.Action"), Translations.GetStr("ChooseAction", newPlan.action));
+            chooseButtons[3].Draw(b, Translations.GetStr("EditPage.Time"), newPlan.time == "" ? "" : Translations.GetStr("EditPage.Time.Description"));
+            chooseButtons[4].Draw(b, Translations.GetStr("EditPage.Item"), newPlan.item); 
+            reminder.Draw(b, xPos - uiWidth - 16, yPos, uiWidth, uiHeight, planPageIndex * 5 + planIndexOnPage);
         }
         else if (pageIndex == (int)PageEnum.choosePage)
         {
             if (choosePageIndex == (int)ChoosePageEnum.characterPage)
             {   
-                choose_bound_list = DrawChoosePage.Draw(b, x_pos, y_pos, ui_width, ui_height, modData.npc_data);
+                chooseBoundList = DrawChoosePage.Draw(b, xPos, yPos, uiWidth, uiHeight, modData.npcData);
             }
             else if (choosePageIndex == (int)ChoosePageEnum.locationPage)
             {
-                Game1.DrawBox(x_pos, y_pos, ui_width, ui_height);
+                Game1.DrawBox(xPos, yPos, uiWidth, uiHeight);
                 SpriteText.drawStringWithScrollCenteredAt(b, Translations.GetStr("ChoosePage", "Title"), base.xPositionOnScreen + base.width / 2, base.yPositionOnScreen - 64);
-                action_bar.Draw(b, pageIndex);
-                choose_bound_list = DrawChoosePage.Draw(b, x_pos, y_pos, ui_width, ui_height, location_display_index, new_plan.npc == "" ? modData.location_data : pririoty_location);
-                updown_button = new PageButton(choose_bound_list[0].X + ui_width + 16, choose_bound_list[0].Y, ui_width, Game1.tileSize * 6, Game1.tileSize * 6);
-                updown_button.DrawUpButton(b);
-                updown_button.DrawDownButton(b);
+                actionBar.Draw(b, pageIndex);
+                chooseBoundList = DrawChoosePage.Draw(b, xPos, yPos, uiWidth, uiHeight, locationDisplayIndex, newPlan.npc == "" ? modData.locationData : pririotyLocation);
+                updownButton = new PageButton(chooseBoundList[0].X + uiWidth + 16, chooseBoundList[0].Y, uiWidth, Game1.tileSize * 6, Game1.tileSize * 6);
+                updownButton.DrawUpButton(b);
+                updownButton.DrawDownButton(b);
             }
             else if (choosePageIndex == (int)ChoosePageEnum.actionPage)
             {
-                Game1.DrawBox(x_pos, y_pos, ui_width, ui_height);
+                Game1.DrawBox(xPos, yPos, uiWidth, uiHeight);
                 SpriteText.drawStringWithScrollCenteredAt(b, Translations.GetStr("ChoosePage", "Title"), base.xPositionOnScreen + base.width / 2, base.yPositionOnScreen - 64);
-                action_bar.Draw(b, pageIndex);
-                choose_bound_dict = DrawChoosePage.Draw(b, x_pos, y_pos, ui_width, ui_height, new_plan.npc != "");
+                actionBar.Draw(b, pageIndex);
+                chooseBoundDict = DrawChoosePage.Draw(b, xPos, yPos, uiWidth, uiHeight, newPlan.npc != "");
             }
             else if(choosePageIndex == (int)ChoosePageEnum.timePage)
             {
-                int x = x_pos - Game1.tileSize / 2;
-                int y = y_pos;
-                int width = ui_width + Game1.tileSize;
-                int height = ui_height + Game1.tileSize / 2;
+                int x = xPos - Game1.tileSize / 2;
+                int y = yPos;
+                int width = uiWidth + Game1.tileSize;
+                int height = uiHeight + Game1.tileSize / 2;
                 SpriteFont font = Game1.smallFont;
                 int gap = Game1.tileSize * 7 / 8;
                 int[] widths = {32, 64, 32, 96};
                 Game1.DrawBox(x, y, width, height);
                 SpriteText.drawStringWithScrollCenteredAt(b, Translations.GetStr("ChoosePage", "Title"), base.xPositionOnScreen + base.width / 2, base.yPositionOnScreen - 64);
-                action_bar.Draw(b, pageIndex);
-                b.DrawString(font, Translations.GetStr("ChooseDate.StartDate"), new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year")).X) / 2, y + action_bar_height), Color.Black);
-                b.DrawString(font, Translations.GetStr("ChooseDate.EndDate"), new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year")).X) / 2, y + action_bar_height + Game1.tileSize * 5 / 2), Color.Black);
+                actionBar.Draw(b, pageIndex);
+                b.DrawString(font, Translations.GetStr("ChooseDate.StartDate"), new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year")).X) / 2, y + actionBarHeight), Color.Black);
+                b.DrawString(font, Translations.GetStr("ChooseDate.EndDate"), new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year")).X) / 2, y + actionBarHeight + Game1.tileSize * 5 / 2), Color.Black);
                 
                 //transform season-day to week-day
                 string week = Translations.GetStr("ChooseDate.WhichWeek", new{ week = (arrowDateButtons[2].Index / 7 + 1).ToString() });
                 string day = TimeList.Days[arrowDateButtons[2].Index % 7];
-                b.DrawString(font, week + " " + day, new Vector2(x + width / 2, y + action_bar_height), Color.Black);
+                b.DrawString(font, week + " " + day, new Vector2(x + width / 2, y + actionBarHeight), Color.Black);
                 week = Translations.GetStr("ChooseDate.WhichWeek", new { week = (arrowDateButtons[6].Index / 7 + 1).ToString() });
                 day = TimeList.Days[arrowDateButtons[6].Index % 7];
-                b.DrawString(font, week + " " + day, new Vector2(x + width / 2, y + action_bar_height + Game1.tileSize * 5 / 2), Color.Black);
+                b.DrawString(font, week + " " + day, new Vector2(x + width / 2, y + actionBarHeight + Game1.tileSize * 5 / 2), Color.Black);
                 
                 //draw time selection text
-                y += action_bar_height + Game1.tileSize / 2;
+                y += actionBarHeight + Game1.tileSize / 2;
                 b.DrawString(font, Translations.GetStr("ChooseDate.Year") + ":", new Vector2(x + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Year") + ":").X) * 3 / 4, y), Color.Black);
                 b.DrawString(font, Translations.GetStr("ChooseDate.Season") + ":", new Vector2(x + widths[0] + gap + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Season") + ":").X) * 3 / 4, y), Color.Black);
                 b.DrawString(font, Translations.GetStr("ChooseDate.Day") + ":", new Vector2(x + widths[0] + widths[1] + gap * 2 + (gap - font.MeasureString(Translations.GetStr("ChooseDate.Day") + ":").X) * 3 / 4, y), Color.Black);
@@ -229,20 +228,20 @@ public class WypMenu : IClickableMenu
             }
             else if (choosePageIndex == (int)ChoosePageEnum.itemPage)
             {
-                Game1.DrawBox(x_pos, y_pos, ui_width, ui_height);
+                Game1.DrawBox(xPos, yPos, uiWidth, uiHeight);
                 SpriteText.drawStringWithScrollCenteredAt(b, Translations.GetStr("ChoosePage", "Title"), base.xPositionOnScreen + base.width / 2, base.yPositionOnScreen - 64);
-                action_bar.Draw(b, pageIndex);
-                item_box.Bounds = new Rectangle(x_pos, y_pos + action_bar_height, ui_width, Game1.tileSize);
-                if (new_plan.item != "")
+                actionBar.Draw(b, pageIndex);
+                itemBox.Bounds = new Rectangle(xPos, yPos + actionBarHeight, uiWidth, Game1.tileSize);
+                if (newPlan.item != "")
                 {
-                    item_box.SetHoverText(new_plan.item);
+                    itemBox.SetHoverText(newPlan.item);
                 }
-                item_box.Draw(b);
+                itemBox.Draw(b);
                 // draw four item descriptions
-                b.DrawString(Game1.smallFont, Translations.GetStr("ChooseItem.Description1"), new Vector2(x_pos + 16, y_pos + action_bar_height + 32 + Game1.tileSize), Color.Black);
-                b.DrawString(Game1.smallFont, Translations.GetStr("ChooseItem.Description2"), new Vector2(x_pos + 16, y_pos + action_bar_height + 32 + Game1.tileSize * 2), Color.Black);
-                b.DrawString(Game1.smallFont, Translations.GetStr("ChooseItem.Description3"), new Vector2(x_pos + 16, y_pos + action_bar_height + 32 + Game1.tileSize * 3), Color.Black);
-                b.DrawString(Game1.smallFont, Translations.GetStr("ChooseItem.Description4"), new Vector2(x_pos + 16, y_pos + action_bar_height + 32 + Game1.tileSize * 4), Color.Black);
+                b.DrawString(Game1.smallFont, Translations.GetStr("ChooseItem.Description1"), new Vector2(xPos + 16, yPos + actionBarHeight + 32 + Game1.tileSize), Color.Black);
+                b.DrawString(Game1.smallFont, Translations.GetStr("ChooseItem.Description2"), new Vector2(xPos + 16, yPos + actionBarHeight + 32 + Game1.tileSize * 2), Color.Black);
+                b.DrawString(Game1.smallFont, Translations.GetStr("ChooseItem.Description3"), new Vector2(xPos + 16, yPos + actionBarHeight + 32 + Game1.tileSize * 3), Color.Black);
+                b.DrawString(Game1.smallFont, Translations.GetStr("ChooseItem.Description4"), new Vector2(xPos + 16, yPos + actionBarHeight + 32 + Game1.tileSize * 4), Color.Black);
             }   
         }
         DrawHoverAction(b);
@@ -260,9 +259,9 @@ public class WypMenu : IClickableMenu
     {
         if (pageIndex == (int)PageEnum.mainPage)
         {
-            if (menu_bound.Contains(x, y))
+            if (menuBound.Contains(x, y))
             {
-                planIndexOnPage = (y - y_pos - action_bar_height) / bar_height;
+                planIndexOnPage = (y - yPos - actionBarHeight) / barHeight;
                 if (CancelCheck(x, y))
                 {
                     if (planPageIndex * 5 + planIndexOnPage < planData.plan.Count)
@@ -273,36 +272,36 @@ public class WypMenu : IClickableMenu
                 }
                 else
                 {
-                    new_plan = new Plan();
+                    newPlan = new Plan();
                     if (planPageIndex * 5 + planIndexOnPage < planData.plan.Count)
                     {
-                        new_plan.npc = planData.plan[planPageIndex * 5 + planIndexOnPage].npc;
-                        new_plan.location = planData.plan[planPageIndex * 5 + planIndexOnPage].location;
-                        new_plan.action = planData.plan[planPageIndex * 5 + planIndexOnPage].action;
-                        new_plan.time = planData.plan[planPageIndex * 5 + planIndexOnPage].time;
-                        new_plan.title = planData.plan[planPageIndex * 5 + planIndexOnPage].title;
-                        new_plan.repeat = planData.plan[planPageIndex * 5 + planIndexOnPage].repeat;
-                        new_plan.special = planData.plan[planPageIndex * 5 + planIndexOnPage].special;
-                        new_plan.item = planData.plan[planPageIndex * 5 + planIndexOnPage].item;
+                        newPlan.npc = planData.plan[planPageIndex * 5 + planIndexOnPage].npc;
+                        newPlan.location = planData.plan[planPageIndex * 5 + planIndexOnPage].location;
+                        newPlan.action = planData.plan[planPageIndex * 5 + planIndexOnPage].action;
+                        newPlan.time = planData.plan[planPageIndex * 5 + planIndexOnPage].time;
+                        newPlan.title = planData.plan[planPageIndex * 5 + planIndexOnPage].title;
+                        newPlan.repeat = planData.plan[planPageIndex * 5 + planIndexOnPage].repeat;
+                        newPlan.special = planData.plan[planPageIndex * 5 + planIndexOnPage].special;
+                        newPlan.item = planData.plan[planPageIndex * 5 + planIndexOnPage].item;
                     }
                     reminder.UpdateReminder();
                     pageIndex = (int)PageEnum.editPage;
                 }
             }
-            else if (action_bar.OKBound.Contains(x, y))
+            else if (actionBar.OKBound.Contains(x, y))
             {
                 
                 exitThisMenu();
             }
-            else if (action_bar.BackBound.Contains(x, y))
+            else if (actionBar.BackBound.Contains(x, y))
             {
                 exitThisMenu();
             }
-            if (leftright_button.LeftBound.Contains(x, y) && planPageIndex > 0)
+            if (leftrightButton.LeftBound.Contains(x, y) && planPageIndex > 0)
             {
                 planPageIndex--;
             }
-            if (leftright_button.RightBound.Contains(x, y) && planPageIndex < planData.plan.Count / 5 && planPageIndex != (config.MaxPlan - 1) / 5)
+            if (leftrightButton.RightBound.Contains(x, y) && planPageIndex < planData.plan.Count / 5 && planPageIndex != (config.MaxPlan - 1) / 5)
             {
                 planPageIndex++;
             }
@@ -313,26 +312,26 @@ public class WypMenu : IClickableMenu
             {
                 titleBox.Click();
             }
-            else if (action_bar.OKBound.Contains(x, y))
+            else if (actionBar.OKBound.Contains(x, y))
             {
                 if (titleBox.Text != "")
                 {
-                    new_plan.title = titleBox.Text;
+                    newPlan.title = titleBox.Text;
                 }
                 if (planPageIndex * 5 + planIndexOnPage >= planData.plan.Count)
                 {
                     //only choosing date is invalid
-                    if(new_plan.title != "" || new_plan.npc != "" || new_plan.location != "" || new_plan.action != "" || new_plan.item != "")
-                        planData.plan.Add(new_plan);
+                    if(newPlan.title != "" || newPlan.npc != "" || newPlan.location != "" || newPlan.action != "" || newPlan.item != "")
+                        planData.plan.Add(newPlan);
                 }
                 else
                 {
-                    planData.plan[planPageIndex * 5 + planIndexOnPage] = new_plan;
+                    planData.plan[planPageIndex * 5 + planIndexOnPage] = newPlan;
                 }
                 titleBox.Release();
                 pageIndex--;
             }
-            else if (action_bar.BackBound.Contains(x, y))
+            else if (actionBar.BackBound.Contains(x, y))
             {
                 titleBox.Release();
                 pageIndex--;
@@ -352,25 +351,25 @@ public class WypMenu : IClickableMenu
         }
         else if (pageIndex == (int)PageEnum.choosePage)
         {
-            List<Rectangle> choose_bound = choose_bound_list;
+            List<Rectangle> chooseBound = chooseBoundList;
             if (choosePageIndex == (int)ChoosePageEnum.locationPage)
             {
-                if (updown_button.UpBound.Contains(x, y) && location_display_index > 0)
+                if (updownButton.UpBound.Contains(x, y) && locationDisplayIndex > 0)
                 {
-                    location_display_index--;
+                    locationDisplayIndex--;
                 }
-                else if (updown_button.DownBound.Contains(x, y) && location_display_index + 6 < modData.location_data.Count)
+                else if (updownButton.DownBound.Contains(x, y) && locationDisplayIndex + 6 < modData.locationData.Count)
                 {
-                    location_display_index++;
+                    locationDisplayIndex++;
                 }
-                else if (choose_bound[0].Contains(x, y))
+                else if (chooseBound[0].Contains(x, y))
                 {
-                    int idx = (y - choose_bound[0].Y) / Game1.tileSize;
-                    new_plan.location = pririoty_location[location_display_index + idx];
-                    location_display_index = 0;
+                    int idx = (y - chooseBound[0].Y) / Game1.tileSize;
+                    newPlan.location = pririotyLocation[locationDisplayIndex + idx];
+                    locationDisplayIndex = 0;
                     pageIndex--;
                 }
-                else if (action_bar.OKBound.Contains(x, y) || action_bar.BackBound.Contains(x, y))
+                else if (actionBar.OKBound.Contains(x, y) || actionBar.BackBound.Contains(x, y))
                 {
                     pageIndex--;
                 }
@@ -378,42 +377,42 @@ public class WypMenu : IClickableMenu
             else if (choosePageIndex == (int)ChoosePageEnum.characterPage)
             {
                 // not safe, but it works.Maybe other data structure can be used to store npc data
-                List<string> keys = modData.npc_data.Keys.ToList();
+                List<string> keys = modData.npcData.Keys.ToList();
                 int i;
-                for (i = 0; i < choose_bound_list.Count; i++)
+                for (i = 0; i < chooseBoundList.Count; i++)
                 {
-                    if (choose_bound_list[i].Contains(x, y))
+                    if (chooseBoundList[i].Contains(x, y))
                     {
-                        if (new_plan.npc != "" && new_plan.npc == keys[i])
+                        if (newPlan.npc != "" && newPlan.npc == keys[i])
                         {
-                            new_plan.npc = "";
+                            newPlan.npc = "";
                         }
                         else
                         {
-                            new_plan.npc = keys[i];
+                            newPlan.npc = keys[i];
                         }
                         pageIndex--;
                         break;
                     }
                 }
-                if (i == choose_bound_list.Count)
+                if (i == chooseBoundList.Count)
                 {
                     pageIndex--;
                 }
             }
             else if (choosePageIndex == (int)ChoosePageEnum.actionPage)
             {
-                if (action_bar.OKBound.Contains(x, y) || action_bar.BackBound.Contains(x, y))
+                if (actionBar.OKBound.Contains(x, y) || actionBar.BackBound.Contains(x, y))
                 {
                     pageIndex--;
                 }
                 else
                 {
-                    foreach (KeyValuePair<string, Rectangle> pair in choose_bound_dict)
+                    foreach (KeyValuePair<string, Rectangle> pair in chooseBoundDict)
                     {
                         if (pair.Value.Contains(x, y))
                         {
-                            new_plan.action = pair.Key;
+                            newPlan.action = pair.Key;
                             pageIndex--;
                         }
                     }
@@ -421,15 +420,15 @@ public class WypMenu : IClickableMenu
             }
             else if (choosePageIndex == (int)ChoosePageEnum.timePage)
             {
-                if (action_bar.BackBound.Contains(x, y))
+                if (actionBar.BackBound.Contains(x, y))
                 {
                     pageIndex--;
                 }
-                else if (action_bar.OKBound.Contains(x, y))
+                else if (actionBar.OKBound.Contains(x, y))
                 {
-                    new_plan.time = Index2TimeString(arrowDateButtons);
-                    new_plan.repeat = EncodeRepeatButton(selectRepeatButton);
-                    new_plan.special = EncodeSpecialDateButton(selectSpecialDayButtons, 3);
+                    newPlan.time = Index2TimeString(arrowDateButtons);
+                    newPlan.repeat = EncodeRepeatButton(selectRepeatButton);
+                    newPlan.special = EncodeSpecialDateButton(selectSpecialDayButtons, 3);
                     pageIndex--;
                 }
                 else
@@ -439,19 +438,19 @@ public class WypMenu : IClickableMenu
             }
             else if (choosePageIndex == (int)ChoosePageEnum.itemPage)
             {
-                if (item_box.Bounds.Contains(x, y))
+                if (itemBox.Bounds.Contains(x, y))
                 {
-                    item_box.Click();
+                    itemBox.Click();
                 }
-                else if (action_bar.OKBound.Contains(x, y))
+                else if (actionBar.OKBound.Contains(x, y))
                 {
-                    new_plan.item = item_box.Text;
-                    item_box.Release();
+                    newPlan.item = itemBox.Text;
+                    itemBox.Release();
                     pageIndex--;
                 }
-                else if (action_bar.BackBound.Contains(x, y))
+                else if (actionBar.BackBound.Contains(x, y))
                 {
-                    item_box.Release();
+                    itemBox.Release();
                     pageIndex--;
                 }
             }
@@ -460,26 +459,26 @@ public class WypMenu : IClickableMenu
     
     private void SetDefaultLocation()
     {
-        pririoty_location = new();
-        location_display_index = 0;
-        if (new_plan.npc != "")
+        pririotyLocation = new();
+        locationDisplayIndex = 0;
+        if (newPlan.npc != "")
         {
-            foreach (string location in modData.location_data)
+            foreach (string location in modData.locationData)
             {
-                if (modData.npc_data[new_plan.npc][0].Contains(location))
-                    pririoty_location.Add(location);
+                if (modData.npcData[newPlan.npc][0].Contains(location))
+                    pririotyLocation.Add(location);
             }
-            foreach (string location in modData.location_data)
+            foreach (string location in modData.locationData)
             {
-                if (!modData.npc_data[new_plan.npc][0].Contains(location))
-                    pririoty_location.Add(location);
+                if (!modData.npcData[newPlan.npc][0].Contains(location))
+                    pririotyLocation.Add(location);
             }
         }
         else
         {
-            foreach (string location in modData.location_data)
+            foreach (string location in modData.locationData)
             {
-                pririoty_location.Add(location);
+                pririotyLocation.Add(location);
             }
         }
     }
@@ -490,29 +489,29 @@ public class WypMenu : IClickableMenu
         hoverFlags.SetDefaultFlags();
         if (pageIndex == (int)PageEnum.mainPage)
         {
-            if (menu_bound.Contains(x, y))
+            if (menuBound.Contains(x, y))
             {
                 hoverFlags.MainPage_HoverPlan = true;
-                planIndexOnPage = (y - y_pos - action_bar_height) / bar_height;
-                hover_plan = planPageIndex * 5 + planIndexOnPage < planData.plan.Count ? planData.plan[planPageIndex * 5 + planIndexOnPage] : new();
+                planIndexOnPage = (y - yPos - actionBarHeight) / barHeight;
+                hoverPlan = planPageIndex * 5 + planIndexOnPage < planData.plan.Count ? planData.plan[planPageIndex * 5 + planIndexOnPage] : new();
             }
             else
             {
                 hoverFlags.MainPage_HoverPlan = false;
-                hover_plan = new();
+                hoverPlan = new();
             }
         }
         else if (pageIndex == (int)PageEnum.editPage)
         {
-            if (choose_buttons[3].TextBound.Contains(x, y))
+            if (chooseButtons[3].TextBound.Contains(x, y))
             {
                 hoverFlags.TimePage_HoverTime = true;
             }
-            if (action_bar.OKBound.Contains(x, y))
+            if (actionBar.OKBound.Contains(x, y))
             {
                 hoverFlags.EditPage_HoverOK = true;
             }
-            else if (action_bar.BackBound.Contains(x, y))
+            else if (actionBar.BackBound.Contains(x, y))
             {
                 hoverFlags.EditPage_HoverBack = true;
             }
@@ -543,15 +542,15 @@ public class WypMenu : IClickableMenu
         {
             if (hoverFlags.MainPage_HoverPlan)
             {
-                string? tmp = TimeString2DisplayText(hover_plan.time);
-                string organized_text = TextUtils.GetOrganizedText(hover_plan); 
+                string? tmp = TimeString2DisplayText(hoverPlan.time);
+                string organizedText = TextUtils.GetOrganizedText(hoverPlan); 
                 if (tmp is not null)
                 {
-                    drawToolTip(b, organized_text, tmp, null);
+                    drawToolTip(b, organizedText, tmp, null);
                 }
                 else
                 {
-                    drawToolTip(b, organized_text, "" , null);
+                    drawToolTip(b, organizedText, "" , null);
                 }
             }
         }
@@ -559,7 +558,7 @@ public class WypMenu : IClickableMenu
         {
             if (hoverFlags.TimePage_HoverTime)
             {
-                string? tmp = TimeString2DisplayText(new_plan.time);
+                string? tmp = TimeString2DisplayText(newPlan.time);
                 if (tmp is not null)
                 {
                     drawToolTip(b, tmp, "", null);
@@ -646,8 +645,8 @@ public class WypMenu : IClickableMenu
     //checkpoint
     private void InitTimePageButtons()
     {
-        int x = x_pos - Game1.tileSize / 2;
-        int y = y_pos + action_bar_height + Game1.tileSize;
+        int x = xPos - Game1.tileSize / 2;
+        int y = yPos + actionBarHeight + Game1.tileSize;
         int gap = Game1.tileSize * 7 / 8;
         int[] widths = {32, 64, 32, 72};
         //start date
@@ -672,7 +671,7 @@ public class WypMenu : IClickableMenu
     private void SetDefaultTime()
     {
         //if time is not set, set current time as default
-        if (new_plan.time == "")
+        if (newPlan.time == "")
         { 
             arrowDateButtons[0].SetDefaultIndex(SDate.Now().Year - 1);
             arrowDateButtons[1].SetDefaultIndex(SDate.Now().SeasonIndex);
@@ -685,42 +684,41 @@ public class WypMenu : IClickableMenu
         }
         else
         {
-            List<string[]> startend_time = DeadlineSplit(new_plan.time);
+            List<string[]> startendTime = DeadlineSplit(newPlan.time);
             for (int i = 0; i < 8; i++)
             {
                 if (i < 4)
                 {
-                    arrowDateButtons[i].SetDefaultIndex(int.Parse(startend_time[0][i]));
+                    arrowDateButtons[i].SetDefaultIndex(int.Parse(startendTime[0][i]));
                 }
                 else
                 {
-                    arrowDateButtons[i].SetDefaultIndex(int.Parse(startend_time[1][i - 4]));
+                    arrowDateButtons[i].SetDefaultIndex(int.Parse(startendTime[1][i - 4]));
                 }
             }
         }
-        DecodeRepeatButton(selectRepeatButton, new_plan.repeat);
-        //ModEntry.Monitor1.Log($"special state = {new_plan.special}", LogLevel.Debug);
-        DecodeSpecialDateButton(new_plan.special, selectSpecialDayButtons, 3);
+        DecodeRepeatButton(selectRepeatButton, newPlan.repeat);
+        DecodeSpecialDateButton(newPlan.special, selectSpecialDayButtons, 3);
     }
     private void CheckEnableRepeat()
     {
-        int start_year = int.Parse(arrowDateButtons[0].GetSelectedValue());
-        int start_season = int.Parse(arrowDateButtons[1].GetSelectedValue());
-        int start_tmp = int.Parse(arrowDateButtons[2].GetSelectedValue());
-        int start_week = start_tmp / 7 + 1;
-        int start_day = start_tmp % 7 + 1;
+        int startYear = int.Parse(arrowDateButtons[0].GetSelectedValue());
+        int startSeason = int.Parse(arrowDateButtons[1].GetSelectedValue());
+        int startTmp = int.Parse(arrowDateButtons[2].GetSelectedValue());
+        int startWeek = startTmp / 7 + 1;
+        int startDay = startTmp % 7 + 1;
 
-        int end_year = int.Parse(arrowDateButtons[4].GetSelectedValue());
-        int end_season = int.Parse(arrowDateButtons[5].GetSelectedValue());
-        int end_tmp = int.Parse(arrowDateButtons[6].GetSelectedValue());
-        int end_week = end_tmp / 7 + 1;
-        int end_day = end_tmp % 7 + 1;
+        int endYear = int.Parse(arrowDateButtons[4].GetSelectedValue());
+        int endSeason = int.Parse(arrowDateButtons[5].GetSelectedValue());
+        int endTmp = int.Parse(arrowDateButtons[6].GetSelectedValue());
+        int endWeek = endTmp / 7 + 1;
+        int endDay = endTmp % 7 + 1;
 
         for (int i = 0; i < 4; i++)
         {
             arrowDateButtons[8 + i].SetIsRepeat(true);
         }
-        if (start_year >= end_year)
+        if (startYear >= endYear)
         {
             arrowDateButtons[8].SetIsRepeat(false);
         }
@@ -728,7 +726,7 @@ public class WypMenu : IClickableMenu
         {
             return;
         }
-        if (start_season >= end_season)
+        if (startSeason >= endSeason)
         {
             arrowDateButtons[9].SetIsRepeat(false);
         }
@@ -736,7 +734,7 @@ public class WypMenu : IClickableMenu
         {
             return;
         }
-        if (start_week >= end_week)
+        if (startWeek >= endWeek)
         {
             arrowDateButtons[10].SetIsRepeat(false);
         }
@@ -744,7 +742,7 @@ public class WypMenu : IClickableMenu
         {
             return;
         }
-        if (start_day >= end_day)
+        if (startDay >= endDay)
         {
             arrowDateButtons[11].SetIsRepeat(false);
         }
@@ -755,9 +753,9 @@ public class WypMenu : IClickableMenu
     }
     private int GetChoosePageIndex(int x, int y)
     {
-        for (int i = 0; i < choose_buttons.Count; i++)
+        for (int i = 0; i < chooseButtons.Count; i++)
         {
-            if (choose_buttons[i].EditBound.Contains(x, y))
+            if (chooseButtons[i].EditBound.Contains(x, y))
             {
                 return i;
             }
@@ -768,7 +766,7 @@ public class WypMenu : IClickableMenu
     {
         for (int i = 0; i < 5; i++)
         {
-            if (cancel_buttons[i].CancelBound.Contains(x, y))
+            if (cancelButtons[i].CancelBound.Contains(x, y))
             {
                 return true;
             }
