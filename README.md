@@ -1,5 +1,5 @@
 # WriteDownYourPlan
-[en](README_en.md) | [zh-cn](README_zh.md)
+[en](README.md) | [中文](files/README_zh.md)
 ## Introduction
 WriteDownYourPlan is a game tool that allows you to easily create plans and receive pop - up reminders when the plans start or end. In the plan menu, you can directly select NPCs, locations, and actions without manual input, and it will also provide you with some information about these elements. Custom text is also supported. <br>
 It's perfect for players who like to plan in game! (Or those who always forget things.) <br>
@@ -23,7 +23,7 @@ nexusmod <br>
 - Part Correlation: When you select an NPC, the available action and location options will change accordingly.
 3. Time Selector: You can set the start and end times of the plan and choose to have repeated reminders.
 4. Plan Reminder: After completing the plan selection, the mod will automatically organize the reminder text for you and display the start and end times.
-5. Reminder Board: The reminder board will display information related to the plan, such as location, weather, festivals, etc. You can view the specific content in the [Message List](messages_en.txt). 
+5. Reminder Board: The reminder board will display information related to the plan, such as location, weather, festivals, etc. You can view the specific content in the [Message List](files/messages_en.txt). 
 ## Usage Tutorial
 Using this mod is very simple. In most cases, you can use it smoothly without any help.
 1. After starting the game, press F3 to open the plan menu (you can customize the shortcut key in the config.json file, but please continue to use F1 - F12. **Using other keys may cause the menu to close unexpectedly during text input**).
