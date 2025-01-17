@@ -1,0 +1,10 @@
+1. Whether the plan for the day starts, repeats, or ends.
+2. Whether the special time conditions for the day are met: rain or luck.
+3. Whether there is a festival on the day.
+4. Whether it is the NPC's birthday on the day.
+5. Whether the NPC can perform the selected action (this is only a possibility, game data has not been read yet).
+6. Whether the NPC will appear at the selected location (after selecting the NPC, the possible locations will be preferentially displayed).
+7. The current location of the NPC.
+8. Whether the NPC's shop is open (under development).
+9. The nearest festivals and NPC birthdays within the start and end time of the plan.
+10. Other detecitons are pending update.

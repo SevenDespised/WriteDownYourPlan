@@ -3,6 +3,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Graphics;
+using StardewValley.TokenizableStrings;
 
 namespace WritedownYourPlan.src;
 public class Reminder
@@ -154,11 +155,11 @@ public class Reminder
             List<SDate> datesForCheck = nowToEndDates?? dates;
             if (IsContainedByPlan(startDate, datesForCheck) || IsContainedByPlan(startDate, datesForCheck.Select(d => new SDate(d.Day, d.Season, d.Year + 1)).ToList()))
             {
-                res.Add(new RemindMessage(reminderContainPassiveFestivalKey, new { festival = passiveFestival.Value.DisplayName, date = startDate.ToLocaleString(withYear: false), enddate = endDate.ToLocaleString(withYear: false) }, 0));
+                string displayText = TokenParser.ParseText(passiveFestival.Value.DisplayName) ;
+                res.Add(new RemindMessage(reminderContainPassiveFestivalKey, new { festival = displayText, date = startDate.ToLocaleString(withYear: false), enddate = endDate.ToLocaleString(withYear: false) }, 0));
                 break;
             }
         }
-
         return res;
     }
     private List<RemindMessage> DetectDate(Plan plan)

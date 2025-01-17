@@ -18,7 +18,7 @@ public class WypMenu : IClickableMenu
     public PlanData planData;
     public ModData modData;
     public ModConfig config;
-    private Reminder reminder;
+    private readonly Reminder reminder;
     public readonly LoadData loaddata = new();
     public readonly int x_pos = (int)(Game1.viewport.Width * Game1.options.zoomLevel * (1 / Game1.options.uiScale)) / 2 - Game1.tileSize * 6 / 2;
     public readonly int y_pos = (int)(Game1.viewport.Height * Game1.options.zoomLevel * (1 / Game1.options.uiScale)) / 2 - Game1.tileSize * 6 / 2 - Game1.tileSize;
@@ -42,20 +42,6 @@ public class WypMenu : IClickableMenu
     readonly List<SelectButton> selectSpecialDayButtons = new();
     readonly List<SelectByArrowButton> arrowDateButtons = new();
     readonly HoverFlags hoverFlags = new();
-    readonly List<string> time_labels = new()
-    {
-        Translations.GetStr("ChooseDate.Year"),
-        Translations.GetStr("ChooseDate.Season"),
-        Translations.GetStr("ChooseDate.Day"),
-        Translations.GetStr("ChooseDate.Hour")
-    };
-    readonly List<string> repeat_labels = new()
-    {
-        Translations.GetStr("ChooseDate.Year"),
-        Translations.GetStr("ChooseDate.Season"),
-        Translations.GetStr("ChooseDate.Week"),
-        Translations.GetStr("ChooseDate.Day")
-    };
     // pageIndex: 0-mainPage, 1-editPage, 2-choosePage
     int pageIndex = (int)PageEnum.mainPage;
     // planPageIndex: the index of plan page
