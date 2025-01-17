@@ -4,6 +4,7 @@ using StardewModdingAPI.Utilities;
 using System.Text.RegularExpressions;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley.TokenizableStrings;
+using StardewValley.GameData.Locations;
 
 namespace WritedownYourPlan.src;
 public class Reminder
@@ -298,6 +299,18 @@ public class Reminder
             {
                 res.Add(new RemindMessage(reminderUnluckyKey, null, remindTime));
             }
+        }
+        return res;
+    }
+    private List<RemindMessage> DetectShop(Plan plan)
+    {
+        List<RemindMessage> res = new();
+        foreach (var location in Game1.locations)
+        {
+            xTile.Map map = location.map;
+            xTile.Dimensions.Location pixelPosition = new (2 * Game1.tileSize, 2 * Game1.tileSize);
+            xTile.Tiles.Tile tile = map.GetLayer("building").PickTile(pixelPosition, Game1.viewport.Size);
+            
         }
         return res;
     }

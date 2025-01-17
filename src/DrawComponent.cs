@@ -725,7 +725,9 @@ public class DrawChoosePage
         for (int i = 0; i < display_cnt && i + location_display_index < locations.Count; i++)
         {
             IClickableMenu.drawTextureBox(b, x, y + height - (display_cnt - i) * box_height, width, box_height, Color.White);
-            b.DrawString(Game1.smallFont, (i + location_display_index + 1).ToString() + " " + Translations.GetStr("ChooseLocation", locations[i + location_display_index]), new Vector2(x + 16, y + 16 + height - (display_cnt - i) * box_height), Color.Black, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0.9999999f);
+            string text = (i + location_display_index + 1).ToString() + " " + Translations.GetStr("ChooseLocation", locations[i + location_display_index]);
+            float scale = Game1.smallFont.MeasureString(text).X + 16 > width - 16 ? (width - 32) / Game1.smallFont.MeasureString(text).X : 1f;
+            b.DrawString(Game1.smallFont, text, new Vector2(x + 16, y + 16 + height - (display_cnt - i) * box_height), Color.Black, 0f, Vector2.Zero, scale, SpriteEffects.None, 0.9999999f);
         }
         return new Rectangle(x, y + height - display_cnt * box_height, width, height);
     }

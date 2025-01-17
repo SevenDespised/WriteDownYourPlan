@@ -105,4 +105,3 @@ public sealed class LoadData
     public static readonly Dictionary<string, string> FestivalData = DataLoader.Festivals_FestivalDates(Game1.content);
     public static readonly Dictionary<string, PassiveFestivalData> PassiveFestivalData = DataLoader.PassiveFestivals(Game1.content);
 }
-

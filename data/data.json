@@ -1,5 +1,5 @@
 {
-    "location_data": [
+    "locationData": [
         "Farm",
         "Town",
         "CommunityCenter",
@@ -40,7 +40,7 @@
         "MovieTheater",
         "LeoTreeHouse"
     ],
-    "npc_data": {
+    "npcData": {
         "Abigail": [[
         "SeedShop",
         "Saloon",
