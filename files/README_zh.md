@@ -1,5 +1,5 @@
 # WriteDownYourPlan
-[en](../README_en.md) | [中文](README_zh.md)
+[en](../README.md) | [中文](README_zh.md)
 ## 简介
 WriteDownYourPlan是一个在游戏内使用的工具，你可以用它方便地制定计划，并在计划开始或结束时弹出提醒。同时，在计划菜单内可以直接选择NPC、地点、行为而无需手动输入，并且会提示你有关这些内容的一些信息，当然也支持自定义文本。<br>
 很适合喜欢在游戏内做规划的玩家！（或者是总是忘记事情的玩家。）<br>
